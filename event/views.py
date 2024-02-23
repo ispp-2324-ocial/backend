@@ -3,8 +3,14 @@ from rest_framework import generics, status
 
 # Create your views here.
 from .models import(
+    Event,
     Rating
 )
+
+class EventView(generics.ListAPIView):
+    def get():
+        event_list = Event.objects.all()
+        return event_list
 
 class RatingView(generics.ListAPIView):
     def get():
