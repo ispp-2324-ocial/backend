@@ -18,8 +18,6 @@ class Subscription(models.Model):
     canHaveRating = models.BooleanField(default=False)
 
 
-
-
     def str(self):
         return "{}".format(self.typeSubscription)
 
