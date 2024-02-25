@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from user.models import OcialUser
 
 # Create your models here.
 class Event(models.Model):
@@ -22,6 +23,8 @@ class Event(models.Model):
     )
     latitude = models.FloatField()
     longitude = models.FloatField()
+    ocialUser = models.ForeignKey(OcialUser, related_name='OcialUser', on_delete=models.CASCADE)
+    
 
     def __str__(self):
         return "{}: {} | {}, {}".format(self.name, self.event, self.date, self.hour)
@@ -47,6 +50,8 @@ class Rating(models.Model):
         validators =[MaxValueValidator(5), MinValueValidator(0)]
     )
     comment = models.TextField(blank=True, null= True)  
+    event = models.ForeignKey(Event, related_name='Rating', on_delete=models.CASCADE)
+
     
     def __str__(self):
         return "{}: {}".format(self.score, self.comment)

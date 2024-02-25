@@ -1,53 +1,34 @@
 from django.test import TestCase
-from event.models import Event, Rating
+from rest_framework.test import APIRequestFactory
+from .models import Event, Rating
+from .views import *
 
 # Create your tests here.
 
-class EventTestCase(TestCase):
+class EventListTestCase(TestCase):
     def setUp(self):
-        self.e1 = Event.objects.create(
-            name="Football Match",
-            place="Stadium ABC",
-            event="Match between Team A and Team B",
-            date="2024-02-25",
-            hour="15:00:00",
-            capacity=50000,
-            category=Event.Category.SPORTS,
-            latitude=40.7128,
-            longitude=-74.0060
-        )
-        self.e2 = Event.objects.create(
-            name="Music Festival",
-            place="Park XYZ",
-            event="Annual Music Festival",
-            date="2024-07-15",
-            hour="18:00:00",
-            capacity=10000,
-            category=Event.Category.MUSIC,
-            latitude=34.0522,
-            longitude=-118.2437
-        )
+        self.factory = APIRequestFactory()
+        self.event1 = Event.objects.create()
+        self.event2 = Event.objects.create()
 
-        self.list1 = [self.e1, self.e2]
-    
-    def test_get_events(self):
-        self.list2 = [self.e1, self.e2]
-        self.assertEqual(self.list1, self.list2)
-
-class RatingTestCase(TestCase):
-    def setUp(self):
-        self.r1 = Rating.objects.create(
-            score = 3,
-            comment = 'Esto es un test'
-        )
+    def test_event_list(self):
+        view = EventList.as_view()
+        request = self.factory.get("/event/list/")
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        data = response.data
+        self.assertEqual(len(data), 2)  # Verificar que se devuelvan todos los event
         
-        self.r2 = Rating.objects.create(
-            score = 2,
-            comment = ''
-        )
+class RatingListTestCase(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.rating1 = Rating.objects.create()
+        self.rating2 = Rating.objects.create()
 
-        self.list1 = [self.r1, self.r2]
-    
-    def test_get_ratings(self):
-        self.list2 = [self.r1, self.r2]
-        self.assertEqual(self.list1, self.list2)
+    def test_rating_list(self):
+        view = RatingList.as_view()
+        request = self.factory.get("/rating/list/")
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        data = response.data
+        self.assertEqual(len(data), 2)  # Verificar que se devuelvan todos los rating
