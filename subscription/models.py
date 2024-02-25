@@ -10,7 +10,7 @@ class Subscription(models.Model):
         choices = TypeSubscription.choices,
         default = TypeSubscription.FREE
     )
-    numEvents = models.PositiveIntegerField()
+    numEvents = models.PositiveIntegerField(default=1)
     canEditEvent = models.BooleanField(default=False)
     canSendNotifications = models.BooleanField(default=False)
     canHaveRecurrentEvents = models.BooleanField(default=False)
@@ -21,9 +21,9 @@ class Subscription(models.Model):
     def str(self):
         return "{}".format(self.typeSubscription)
 
-    def save(self, args, **kwargs):
+    def save(self, *args, **kwargs):
         is_new = not self.pk
-        super().save(args, **kwargs)
+        super().save(*args, **kwargs)
 
         if is_new:
             typeSubscription = self.typeSubscription
