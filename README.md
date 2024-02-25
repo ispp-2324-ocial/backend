@@ -1,8 +1,22 @@
-# Guía para Poner en Marcha el Repositorio Backend
+# Backend de Ocial
+
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=bugs)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ispp-2324-ocial_backend&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=ispp-2324-ocial_backend)
+
+## Guía para Poner en Marcha el Repositorio Backend
 
 Esta guía proporciona los pasos necesarios para configurar el entorno y comenzar a utilizar el repositorio backend.
 
-## Preparación del Entorno
+### Preparación del Entorno
 Antes de comenzar, asegúrate de tener el entorno adecuado configurado. Sigue estos pasos para preparar el entorno:
 
 1. Preparar WSL:
@@ -14,7 +28,7 @@ Antes de comenzar, asegúrate de tener el entorno adecuado configurado. Sigue es
 sudo apt install python3 python3-venv
 ```
 
-## Configuración del Repositorio
+### Configuración del Repositorio
 Una vez que el entorno esté configurado, sigue estos pasos para configurar el repositorio backend:
 
 1. Clonar el repositorio:
@@ -41,13 +55,3 @@ source env/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
-
-
-   
-
-
-
-
-
-
-
