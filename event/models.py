@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-from user.models import OcialUser
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Event(models.Model):
@@ -23,7 +23,7 @@ class Event(models.Model):
     )
     latitude = models.FloatField()
     longitude = models.FloatField()
-    ocialUser = models.ForeignKey(OcialUser, related_name='OcialUser', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='User', on_delete=models.CASCADE)
     
 
     def __str__(self):

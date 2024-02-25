@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from localflavor.es.models import ESIdentityCardNumberField
-# from event.models import Event
+from event.models import Event
 
 class OcialUser(models.Model):
     class TypesfavEvent(models.TextChoices):
