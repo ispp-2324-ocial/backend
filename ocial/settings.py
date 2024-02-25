@@ -27,18 +27,49 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
 
 # Application definition
 
 INSTALLED_APPS = [
     'subscription',
+    'event',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+    'localflavor',
+    'user',
+    'chat',
+    'drf_spectacular',
 ]
+
+STATIC_URL = '/static/'
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'default': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+    'USE_SESSION_AUTH': False
+}
+
+SPECTACULAR_SETTINGS = {
+    'SCHEMA_PATH_PREFIX': '/api',
+    'TITLE': 'TraineerBook API',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_COERCE_PATH_PK_SUFFIX': True,
+    'COMPONENT_NO_READ_ONLY_REQUIRED': True,
+    'COMPONENT_SPLIT_PATCH': True,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -76,11 +107,14 @@ WSGI_APPLICATION = 'ocial.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ocialdb',
+        'USER': 'ocialuser',
+        'PASSWORD': 'ocialpass123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
