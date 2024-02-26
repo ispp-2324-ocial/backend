@@ -113,7 +113,7 @@ DATABASES = {
         'USER': 'ocialuser',
         'PASSWORD': 'ocialpass123',
         'HOST': 'localhost',
-        'PORT': '5431',
+        'PORT': '5432',
     }
 }
 
