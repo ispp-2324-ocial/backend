@@ -1,0 +1,214 @@
+from django.contrib.auth import authenticate, login
+from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from rest_framework import generics
+from rest_framework import status, permissions
+from user.serializer import *
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated 
+from django.contrib.auth import authenticate, login
+
+
+
+class RegisterUserView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(
+        request=UserSerializer,
+        responses={
+            200: OpenApiResponse(response=None),
+            400: OpenApiResponse(response=None, description="Los datos de la petición son incorrectos"),
+            409: OpenApiResponse(response=None, description="El nombre de usuario ya existe")
+        }
+    )
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            username = request.data.get('username')
+            
+            # Verificar si el nombre de usuario ya existe
+            if User.objects.filter(username=username).exists():
+                return Response({"error": "El nombre de usuario ya existe"}, status=status.HTTP_409_CONFLICT)
+
+            # Crear el usuario y establecer la contraseña sin guardarlo inmediatamente
+            user = serializer.save()
+
+            # Establecer la contraseña y guardar el usuario
+            user.set_password(request.data.get('password'))
+            user.save()
+
+            # Iniciar sesión automáticamente después del registro
+            login(request, user)
+
+            return Response(status=status.HTTP_200_OK)
+
+        # Verificar específicamente si el error es debido al nombre de usuario duplicado
+        if 'username' in serializer.errors and 'Ya existe un usuario con este nombre.' in serializer.errors['username']:
+            return Response({"error": "El nombre de usuario ya existe"}, status=status.HTTP_409_CONFLICT)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginUserView(APIView):
+    """
+    Inicia la sesión del usuario y devuelve el token de autenticación
+    """
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(
+        request=LoginUserSerializer,
+        responses={
+            200: OpenApiResponse(response=inline_serializer(
+                    name='TokenResponse',
+                    fields={ 'token': serializers.StringRelatedField() }),
+                description="Token de autenticación"),
+            400: OpenApiResponse(response=None, description="Los datos de la petición son incorrectos"),
+            401: OpenApiResponse(response=None, description="Las credenciales son incorrectas")}
+    )
+    def post(self, request):
+        serializer = LoginUserSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+
+                # Generar o recuperar el token del usuario
+                token, created = Token.objects.get_or_create(user=user)
+
+                return Response({'token': token.key }, status=status.HTTP_200_OK)
+            else:
+                # La contraseña es incorrecta o no existe el usuario
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutUserView(APIView):
+    """
+    Cierra la sesión del usuario eliminando el token de autenticación
+    """
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(response=None),
+            304: OpenApiResponse(response=None, description="Django ha detectado un usuario, pero el token no existe, por lo que se considera que la sesión está cerrada"),
+            401: OpenApiResponse(response=None, description="El usuario no está autenticado")}
+    )
+    def post(self, request):
+        # Obtener el token asociado al usuario actual
+        try:
+            token = Token.objects.get(user=request.user)
+        except Token.DoesNotExist:
+            # Si el token no existe, la sesión ya se considera cerrada
+            return Response(status=status.HTTP_304_NOT_MODIFIED)
+
+        # Eliminar el token de autenticación
+        token.delete()
+
+        return Response(status=status.HTTP_200_OK)
+    
+    
+class RegisterClientView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(
+        request=ClientSerializer,
+        responses={
+            200: OpenApiResponse(response=None),
+            400: OpenApiResponse(response=None, description="Los datos de la petición son incorrectos"),
+            409: OpenApiResponse(response=None, description="El nombre de usuario ya existe")
+        }
+    )
+    def post(self, request):
+        serializer = ClientSerializer(data=request.data)
+        if serializer.is_valid():
+            username = request.data.get('username')
+            
+            # Verificar si el nombre de usuario ya existe
+            if User.objects.filter(username=username).exists():
+                return Response({"error": "El nombre de usuario ya existe"}, status=status.HTTP_409_CONFLICT)
+
+            # Crear el usuario y establecer la contraseña sin guardarlo inmediatamente
+            user = serializer.save()
+
+            # Establecer la contraseña y guardar el usuario
+            user.set_password(request.data.get('password'))
+            user.save()
+
+            # Iniciar sesión automáticamente después del registro
+            login(request, user)
+
+            return Response(status=status.HTTP_200_OK)
+
+        # Verificar específicamente si el error es debido al nombre de usuario duplicado
+        if 'username' in serializer.errors and 'Ya existe un usuario con este nombre.' in serializer.errors['username']:
+            return Response({"error": "El nombre de usuario ya existe"}, status=status.HTTP_409_CONFLICT)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginClientView(APIView):
+    """
+    Inicia la sesión del usuario y devuelve el token de autenticación
+    """
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(
+        request=LoginClientSerializer,
+        responses={
+            200: OpenApiResponse(response=inline_serializer(
+                    name='TokenResponse',
+                    fields={ 'token': serializers.StringRelatedField() }),
+                description="Token de autenticación"),
+            400: OpenApiResponse(response=None, description="Los datos de la petición son incorrectos"),
+            401: OpenApiResponse(response=None, description="Las credenciales son incorrectas")}
+    )
+    def post(self, request):
+        serializer = LoginClientSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+
+                # Generar o recuperar el token del usuario
+                token, created = Token.objects.get_or_create(user=user)
+
+                return Response({'token': token.key }, status=status.HTTP_200_OK)
+            else:
+                # La contraseña es incorrecta o no existe el usuario
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutClientView(APIView):
+    """
+    Cierra la sesión del usuario eliminando el token de autenticación
+    """
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(response=None),
+            304: OpenApiResponse(response=None, description="Django ha detectado un usuario, pero el token no existe, por lo que se considera que la sesión está cerrada"),
+            401: OpenApiResponse(response=None, description="El usuario no está autenticado")}
+    )
+    def post(self, request):
+        # Obtener el token asociado al usuario actual
+        try:
+            token = Token.objects.get(user=request.user)
+        except Token.DoesNotExist:
+            # Si el token no existe, la sesión ya se considera cerrada
+            return Response(status=status.HTTP_304_NOT_MODIFIED)
+
+        # Eliminar el token de autenticación
+        token.delete()
+
+        return Response(status=status.HTTP_200_OK)
