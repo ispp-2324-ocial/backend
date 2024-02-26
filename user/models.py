@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from localflavor.es.models import ESIdentityCardNumberField
-from event.models import Event
+
 
 class OcialUser(models.Model):
     class TypesfavEvent(models.TextChoices):
@@ -25,7 +25,7 @@ class OcialUser(models.Model):
     def save(self, *args, **kwargs):
         is_new = not self.pk
         super().save(*args, **kwargs)
-
+        
 class OcialClient(models.Model):
     class TypeClient(models.TextChoices):
         SMALL_BUSINESS = 0, ('Small business')
