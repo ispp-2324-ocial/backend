@@ -4,15 +4,8 @@ from localflavor.es.models import ESIdentityCardNumberField
 
 class OcialUser(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    city = models.TextField()
-    dni = ESIdentityCardNumberField(blank = True, null = True)
-    '''
-    La categoria esta en la rama de eventos
-    fav_category = models.TextField(
-        choices=Category.choices,
-        default=Category.SPORTS
-    )
-    '''
+    #TODO - Last known location
+    #TODO - Fav event types
 
     def __str__(self):
         return self.usuario.username
@@ -21,6 +14,29 @@ class OcialUser(models.Model):
         is_new = not self.pk
         super().save(*args, **kwargs)
 
-        if is_new:
-            city = self.city
-            dni = self.dni
+class OcialClient(models.Model):
+    class TypeClient(models.TextChoices):
+        SMALL_BUSINESS = 0, ('Small business')
+        ARTIST = 1, ('Artist')
+        BAR_RESTAURANT = 2, ('Bar Restaurant')
+        LOCAL_GUIDE = 3, ('Local Guide')
+        EVENTS_AND_CONCERTS = 4, ('Events And Concerts')
+
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.TextField()
+    identification_document = ESIdentityCardNumberField()
+    typeClient = models.TextField(
+        choices=TypeClient.choices,
+        default=TypeClient.SMALL_BUSINESS
+    )
+    default_latitude = models.FloatField()
+    default_longitude = models.FloatField()
+
+    
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        super().save(*args, **kwargs)
