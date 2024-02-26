@@ -24,7 +24,7 @@ class OcialUser(models.Model):
     def save(self, *args, **kwargs):
         is_new = not self.pk
         super().save(*args, **kwargs)
-
+        
 class OcialClient(models.Model):
     class TypeClient(models.TextChoices):
         SMALL_BUSINESS = 0, ('Small business')
