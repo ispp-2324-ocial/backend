@@ -43,6 +43,7 @@ class Event(models.Model):
             category = self.category
             latitude = self.latitude
             longitude = self.longitude
+            ocialClient = self.ocialClient
 
 class Rating(models.Model):
     score = models.PositiveIntegerField(
@@ -63,3 +64,4 @@ class Rating(models.Model):
         if is_new:
             score = self.score
             comment = self.comment
+            event = self.event

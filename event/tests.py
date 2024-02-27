@@ -1,6 +1,8 @@
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from .models import Event, Rating
+from user.models import OcialClient, OcialUser
+from django.contrib.auth.models import User
 from .views import *
 
 # Create your tests here.
@@ -8,8 +10,40 @@ from .views import *
 class EventListTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
-        self.event1 = Event.objects.create()
-        self.event2 = Event.objects.create()
+        self.user_3 = User.objects.create_user('ocialuser3', 'chevy@chase.com', 'chevyspassword')
+        self.client1 = OcialClient.objects.create(
+            usuario = self.user_3,
+            name = 'A',
+            identification_document = 'X1234567A', #nie
+            typeClient = OcialClient.TypeClient.BAR_RESTAURANT,
+            default_latitude = 40.7128,
+            default_longitude = 0.0
+        )
+        self.event1 = Event.objects.create(
+            name="Football Match",
+            place="Stadium ABC",
+            event="Match between Team A and Team B",
+            date="2024-02-25",
+            hour="15:00:00",
+            capacity=50000,
+            category=Event.Category.SPORTS,
+            latitude=40.7128,
+            longitude=-74.0060,
+            ocialClient = self.client1
+        )
+        self.event2 = Event.objects.create(
+            name="Music Festival",
+            place="Park XYZ",
+            event="Annual Music Festival",
+            date="2024-07-15",
+            hour="18:00:00",
+            capacity=10000,
+            category=Event.Category.MUSIC,
+            latitude=34.0522,
+            longitude=-118.2437,
+            ocialClient = self.client1
+        )
+
 
     def test_event_list(self):
         view = EventList.as_view()
