@@ -5,36 +5,35 @@ from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.types import OpenApiTypes
 from user.models import OcialClient, OcialUser  
 from django.contrib.auth.models import User
-
-from django.contrib.auth.models import User
-from rest_framework import serializers
-from .models import OcialClient
-
 from django.contrib.auth import get_user_model
+
+class DjangoUserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for djangouser registration.
+
+    Fields:
+    - `username` (string): The username of the user.
+    - `email` (string): The email of the user.
+    - `password` (string): The password of the user.
+
+    Note:
+    - The `password` field is write-only, and it should be sent during user registration.
+    """
+
+    class Meta:
+        model = User
+        fields = '__all__'
 
 class ClientSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     email = serializers.EmailField(write_only=True, required=False)
     username = serializers.CharField(write_only=True)
-
+    
     class Meta:
         model = OcialClient
-        fields = ['name', 'identification_document', 'typeClient', 'default_latitude', 'default_longitude', 'password', 'email', 'username']
-
-    def create(self, validated_data):
-        # Extract fields for Django user creation
-        username = validated_data.pop('username')
-        email = validated_data.pop('email', '')
-        password = validated_data.pop('password')
-
-        # Create a new User instance
-        user = get_user_model().objects.create_user(username=username, email=email, password=password)
-
-        # Create OcialClient instance associated with the created user
-        ocial_client = OcialClient.objects.create(**validated_data)
-
-        return ocial_client
+        fields = '__all__'
         
+
 class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for user registration.

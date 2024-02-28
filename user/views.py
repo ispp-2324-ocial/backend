@@ -125,22 +125,38 @@ class RegisterClientView(APIView):
     )
     def post(self, request):
         serializer = ClientSerializer(data=request.data)
-        if serializer.is_valid():
-            username = request.data.get('username')
-            
+        username = request.data.get('username')
+        password = request.data.get('password')
+        email = request.data.get('email')
+
+        if User.objects.filter(username=username).exists():
+            return Response({"error": "El nombre de usuario ya existe"}, status=status.HTTP_409_CONFLICT)
+        
+        userCreated = get_user_model().objects.create_user(username= username, password = password, email=email)
+        userCreated.set_password(request.data.get('password'))
+        userCreated.save()
+
+        data = request.data
+        data['usuario'] = userCreated.id
+
+        serializer = ClientSerializer(data=data)
+
+        if serializer.is_valid():            
             # Verificar si el nombre de usuario ya existe
-            if User.objects.filter(username=username).exists():
-                return Response({"error": "El nombre de usuario ya existe"}, status=status.HTTP_409_CONFLICT)
+            data.pop('username')
+            data.pop('password')
+            data.pop('email')
 
-            # Crear el usuario y establecer la contraseña sin guardarlo inmediatamente
-            user = serializer.save()
 
-            # Establecer la contraseña y guardar el usuario
-            user.set_password(request.data.get('password'))
-            user.save()
+            ocial_client = OcialClient.objects.create(name=data.get('name'), identification_document=data.get('identification_document'), typeClient=data.get('typeClient'),
+            default_latitude=data.get('default_latitude'), default_longitude=data.get('default_longitude'), usuario= userCreated)
+
+            user_instance = User.objects.get(pk=userCreated.id)
+            ocial_client.usuario = user_instance
+            ocial_client.save()
 
             # Iniciar sesión automáticamente después del registro
-            login(request, user)
+            login(request, userCreated)
 
             return Response(status=status.HTTP_200_OK)
 
