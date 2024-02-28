@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, status
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.openapi import OpenApiResponse 
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import *
 
@@ -10,6 +11,25 @@ from .models import(
     Event,
     Rating
 )
+
+class EventValidation(generics.ListAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+
+    @extend_schema(
+        description="Validate an Event",
+        responses={
+            200: OpenApiResponse(response=EventSerializer(many=True)),
+            400: OpenApiResponse(response=None, description="Error in request")
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        serializer = EventSerializer()
+        if serializer.is_valid() and (request.data.get('ocial_client') == request.data.get('event').get('ocial_client')):
+            serializer.get() #coger sus eventos
+            return Response(status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EventList(generics.ListAPIView):
     queryset = Event.objects.all()
@@ -26,22 +46,31 @@ class EventList(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
     
 class EventCreate(generics.CreateAPIView):
-    queryset = Event.objects.all()
     serializer_class = EventCreateSerializer
 
     @extend_schema(
         request=EventCreateSerializer,
         description="Create a new event",
         responses={
-            201: OpenApiResponse(response=EventSerializer()),
+            201: OpenApiResponse(response=EventCreateSerializer()),
             400: OpenApiResponse(response=None, description="Error in request")
         }
     )
     def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+        
+        serializer = EventCreateSerializer(data=request.data)
+        event = request.data.get('event')
+        user = request.user
+        clientUser = request.data.get('event.ocial_client.usuario')
+        
+        if serializer.is_valid() and (user == clientUser):
+            eventCreate = Event.objects.create(event)
+            eventCreate.save() 
+            return Response(status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class EventDelete(generics.DestroyAPIView):
-    queryset = Event.objects.all()
     serializer_class = EventSerializer
 
     @extend_schema(
@@ -52,7 +81,14 @@ class EventDelete(generics.DestroyAPIView):
         }
     )
     def delete(self, request, *args, **kwargs):
-        return super().delete(request, *args, **kwargs)
+        
+        event = request.data.get('event')
+        serializer = EventSerializer()
+        if serializer.is_valid():
+            serializer.delete(event)
+            return Response(status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class EventUpdate(generics.UpdateAPIView):
     queryset = Event.objects.all()
@@ -67,7 +103,17 @@ class EventUpdate(generics.UpdateAPIView):
         }
     )
     def put(self, request, *args, **kwargs):
-        return super().put(request, *args, **kwargs)
+        
+        event = request.data.get('event')
+        client = request.data.get('ocial_client')
+        serializer = EventSerializer()
+
+        if serializer.is_valid() and (event['ocial_client'] == client):
+            serializer.save(event)
+            event.save()
+            return Response(status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RatingList(generics.ListAPIView):
     queryset = Rating.objects.all()

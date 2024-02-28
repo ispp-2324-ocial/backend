@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Event, Rating
+from .models import Event, Rating, OcialClient
+from django.contrib.auth.models import User
+
 
 
 class RatingSerializer(serializers.ModelSerializer):
@@ -8,8 +10,6 @@ class RatingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class EventSerializer(serializers.ModelSerializer):
-    ratings = RatingSerializer(many=True, read_only=True)
-
     class Meta:
         model = Event
         fields = '__all__'
@@ -19,10 +19,23 @@ class RatingCreateSerializer(serializers.ModelSerializer):
         model = Rating
         fields = '__all__'
         
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username']
+
+class OcialClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OcialClient
+        fields = '__all__'
+        
 class EventCreateSerializer(serializers.ModelSerializer):
-    ratings = RatingSerializer(many=True, read_only=True)
+    userSer = UserSerializer()
+    ocialClient = OcialClientSerializer()
     
     class Meta:
         model = Event
         fields = '__all__'
+
+
 
