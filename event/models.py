@@ -25,6 +25,12 @@ class Event(models.Model):
     longitude = models.FloatField()
     ocialClient = models.ForeignKey(OcialClient, related_name='OcialClient', on_delete=models.CASCADE)
     
+    # def get_event_by_client(self):
+       # obj = Event.objects.get(pk=self.object.id)
+        # return obj
+    
+    # def get_event_with_latitud():
+        
 
     def __str__(self):
         return "{}: {} | {}, {}".format(self.name, self.event, self.date, self.hour)
