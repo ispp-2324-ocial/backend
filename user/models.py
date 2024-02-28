@@ -3,9 +3,20 @@ from django.contrib.auth.models import User
 from localflavor.es.models import ESIdentityCardNumberField
 
 class OcialUser(models.Model):
+    class TypesfavEvent(models.TextChoices):
+        SPORTS = 0, ('Sports')
+        MUSIC = 1, ('Music')
+        MARKETS = 2, ('Markets')
+        RELAX_ACTIVITIES = 3, ('Relax activities')
+        LIVE_CONCERTS = 4, ('Lice concerts')
+
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    #TODO - Last known location
-    #TODO - Fav event types
+    lastKnowLocLat = models.FloatField()
+    lastKnowLocLong = models.FloatField()
+    typesfavEventType = models.TextField(
+        choices=TypesfavEvent.choices,
+        default=TypesfavEvent.SPORTS
+    ) 
 
     def __str__(self):
         return self.usuario.username
