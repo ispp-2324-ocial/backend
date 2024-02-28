@@ -22,23 +22,38 @@ class RegisterUserView(APIView):
         }
     )
     def post(self, request):
+        User = get_user_model()
+
         serializer = UserSerializer(data=request.data)
+        username = request.data.get('username')
+        password = request.data.get('password')
+        email = request.data.get('email')
+
+        if User.objects.filter(username=username).exists():
+            return Response({"error": "El nombre de usuario ya existe"}, status=status.HTTP_409_CONFLICT)
+        
+        user_created = User.objects.create_user(username=username, password=password, email=email)
+
+        data = request.data
+        data['usuario'] = user_created.id
+
+        serializer = UserSerializer(data=data)
+
         if serializer.is_valid():
-            username = request.data.get('username')
-            
-            # Verificar si el nombre de usuario ya existe
-            if User.objects.filter(username=username).exists():
-                return Response({"error": "El nombre de usuario ya existe"}, status=status.HTTP_409_CONFLICT)
+            data.pop('username')
+            data.pop('password')
+            data.pop('email')
 
-            # Crear el usuario y establecer la contraseña sin guardarlo inmediatamente
-            user = serializer.save()
-
-            # Establecer la contraseña y guardar el usuario
-            user.set_password(request.data.get('password'))
-            user.save()
+            # Crear un nuevo OcialUser
+            ocial_user = OcialUser.objects.create(
+                lastKnowLocLat=data.get('lastKnowLocLat'),
+                lastKnowLocLong=data.get('lastKnowLocLong'),
+                typesfavEventType=data.get('typesfavEventType'),
+                usuario_id=user_created.id
+            )
 
             # Iniciar sesión automáticamente después del registro
-            login(request, user)
+            login(request, user_created)
 
             return Response(status=status.HTTP_200_OK)
 

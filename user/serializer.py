@@ -35,23 +35,13 @@ class ClientSerializer(serializers.ModelSerializer):
         
 
 class UserSerializer(serializers.ModelSerializer):
-    """
-    Serializer for user registration.
-
-    Fields:
-    - `id` (int): The ID of the user.
-    - `username` (string): The username of the user.
-    - `email` (string): The email of the user.
-    - `password` (string): The password of the user.
-
-    Note:
-    - The `password` field is write-only, and it should be sent during user registration.
-    """
-
+    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True, required=False)
+    username = serializers.CharField(write_only=True)
+    
     class Meta:
         model = OcialUser
-        fields = ['usuario']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = '__all__'
 
 class LoginClientSerializer(serializers.Serializer):
     """
