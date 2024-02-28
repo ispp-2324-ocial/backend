@@ -32,8 +32,6 @@ class OcialClient(models.Model):
     default_latitude = models.FloatField()
     default_longitude = models.FloatField()
 
-    
-
     def __str__(self):
         return self.name
 
