@@ -1,0 +1,49 @@
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+
+## Commit message with ! to draw attention to breaking change, like this:
+## refactor!: drop support for Node 6
+
+### types:
+# build (for building and packaging)
+# chore (repository cleanup and other 'housekeeping')
+# ci (continuos integration)
+# docs (documentation)
+# feat (new feature)
+# fix (bugfixing)
+# perf (performance improvements)
+# refactor (refactorization)
+# revert (Commit that reverts another one)
+# style (linting commits or frontend's CSS changes)
+# test (testing-related code)
+
+### description
+# Headline of your changes
+
+### body
+# Extended description of what the commit changes and why
+
+
+### footer
+# To reference existing issues, pull requests, related commits (for reverts) or if the commit is a breaking change.
+
+## EXAMPLES
+# chore: cleanup of the source tree
+
+# The source tree of the repository was convoluted. Merged related files into subfolders
+# Fixes #2
+
+# ---
+
+# ci(devcontainer): improve devcontainer config
+
+# Devcontainer now has all the utilities installed
+
+# ---
+
+# feat(frontend): authetication
+
+# Finished the first implementation of the auth mechanism, which uses JWT and a cookie to store and exchange the token with the server

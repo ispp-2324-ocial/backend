@@ -1,0 +1,37 @@
+{
+  "name": "Ocial's Backend Codespace",
+  "image": "python:latest",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {},
+    "ghcr.io/devcontainers-contrib/features/apt-packages:1": {
+      "preserve_apt_list": false,
+      "packages": [
+        "openjdk-17-jre"
+      ]
+    }
+  },
+  "forwardPorts": [
+    8000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "Ocial backend",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": {
+    "pip": "pip install -r backend/requirements.txt",
+    "use-bash": "rm -rf /bin/sh && ln -s /bin/bash /bin/sh",
+    "git-editor": "git config --global core.editor 'code --wait'",
+    "git-template": "git config commit.template .gitmessage"
+  },
+  "postAttachCommand": "cat .vscode/extensions.json | jq -r .recommendations[] | xargs -n 1 code --install-extension",
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb"
+  }
+}
