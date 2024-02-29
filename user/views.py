@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework import generics
 from rest_framework import status, permissions
-from user.serializer import *
+from user.serializers import *
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated 
 from django.contrib.auth import authenticate, login

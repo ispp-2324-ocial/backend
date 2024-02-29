@@ -9,20 +9,15 @@ class RatingSerializer(serializers.ModelSerializer):
         model = Rating
         fields = '__all__'
 
-class EventSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = '__all__'
-
 class RatingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = '__all__'
-        
-class UserSerializer(serializers.ModelSerializer):
+
+class EventSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['username']
+        model = Event
+        fields = '__all__'
 
 class OcialClientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,8 +25,6 @@ class OcialClientSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class EventCreateSerializer(serializers.ModelSerializer):
-    userSer = UserSerializer()
-    ocialClient = OcialClientSerializer()
     
     class Meta:
         model = Event
