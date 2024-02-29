@@ -25,7 +25,7 @@ project:
     member5:
       name: 'Fernando'
       surname: 'Fernandez' 
-      github: 'ferferga'
+      githubUsername: 'ferferga'
     member6:
       name: 'Francisco'
       surname: 'Villalobos' 
