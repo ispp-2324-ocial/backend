@@ -9,7 +9,7 @@ class OcialUser(models.Model):
         MUSIC = 1, ('Music')
         MARKETS = 2, ('Markets')
         RELAX_ACTIVITIES = 3, ('Relax activities')
-        LIVE_CONCERTS = 4, ('Lice concerts')
+        LIVE_CONCERTS = 4, ('Live concerts')
 
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     lastKnowLocLat = models.FloatField(default=0.0)
