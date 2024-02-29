@@ -1,0 +1,64 @@
+project:
+  name: 'ISPP-2024-L1-02'
+  owner: 'L1'
+  teamId: '02'
+  identities: {}
+  notifications:
+    email: 'adrromflo@alum.us.es'
+  members:
+    member1:
+      name: 'Adrian'
+      surname: 'Romero' 
+      githubUsername: 'adrrf'
+    member2:
+      name: 'Aitor'
+      surname: 'Rodriguez' 
+      githubUsername: 'AitorRD'
+    member3:
+      name: 'Carlos'
+      surname: 'Varela' 
+      githubUsername: 'carvarsou'
+    member4:
+      name: 'Eduardo'
+      surname: 'Pizarro' 
+      githubUsername: 'Domi-ATLAS'
+    member5:
+      name: 'Fernando'
+      surname: 'Fernandez' 
+      github: 'ferferga'
+    member6:
+      name: 'Francisco'
+      surname: 'Villalobos' 
+      githubUsername: 'fravilpae'
+    member7:
+      name: 'Horacio'
+      surname: 'García' 
+      githubUsername: 'horgarler'
+    member8:
+      name: 'Iñigo'
+      surname: 'Ruiz' 
+      githubUsername: 'iniruimar'
+    member9:
+      name: 'Jesus'
+      surname: 'Zambrana' 
+      githubUsername: 'Jeszamgue'
+    member10:
+      name: 'Jose Carlos'
+      surname: 'Ortiz' 
+      githubUsername: 'josecaog26'
+    member11:
+      name: 'Juan Jose'
+      surname: 'Gómez'
+      githubUsername: 'lDrakohh'
+    member12:
+      name: 'Paula'
+      surname: 'Peña' 
+      githubUsername: 'paupenfer1'
+    member13:
+      name: 'Ramon'
+      surname: 'Guerrero' 
+      githubUsername: 'Ramguerom'
+    member14:
+      name: 'Raul'
+      surname: 'Montalban' 
+      githubUsername: 'raumonmar1'
