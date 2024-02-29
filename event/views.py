@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.openapi import OpenApiResponse 
 from rest_framework.views import APIView
@@ -46,27 +46,42 @@ class EventList(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
     
 class EventCreate(generics.CreateAPIView):
-    serializer_class = EventCreateSerializer
+    permission_classes = [permissions.AllowAny]
 
     @extend_schema(
         request=EventCreateSerializer,
         description="Create a new event",
         responses={
-            201: OpenApiResponse(response=EventCreateSerializer()),
+            201: OpenApiResponse(response=None),
             400: OpenApiResponse(response=None, description="Error in request")
         }
     )
-    def post(self, request, *args, **kwargs):
-        
+    def post(self, request, *args, **kwargs):       
+        if not User.objects.filter(id=request.user.id).exists():
+            return Response({"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.data.pop('ocialClient')
+        ocialClient = OcialClient.objects.filter(usuario=request.user)
+        if not ocialClient:
+            return Response({"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN)
+        ocialClient = ocialClient[0]
+        request.data['ocialClient'] = ocialClient.id
         serializer = EventCreateSerializer(data=request.data)
-        event = request.data.get('event')
-        user = request.user
-        clientUser = request.data.get('event.ocial_client.usuario')
-        
-        if serializer.is_valid() and (user == clientUser):
-            eventCreate = Event.objects.create(event)
-            eventCreate.save() 
-            return Response(status=status.HTTP_201_CREATED)
+
+        if serializer.is_valid():
+            name = request.data.get('name')
+            place = request.data.get('place')
+            event = request.data.get('event')
+            date = request.data.get('date')
+            hour = request.data.get('hour')
+            capacity = request.data.get('capacity')
+            category = request.data.get('category')
+            latitude = request.data.get('latitude')
+            longitude = request.data.get('longitude')
+            eventCreated = Event.objects.create(name=name, place=place, event=event, date=date, hour=hour,
+            capacity=capacity, category=category, latitude=latitude, longitude=longitude, ocialClient=ocialClient)
+            eventCreated.save()            
+            return Response(status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
