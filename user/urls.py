@@ -9,3 +9,4 @@ urlpatterns = [
     # URLs para clientes
     path('client/register/', views.RegisterClientView.as_view(), name='client_register'),
 ]
+
