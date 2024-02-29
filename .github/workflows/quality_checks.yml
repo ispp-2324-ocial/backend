@@ -121,3 +121,18 @@ jobs:
 
       - name: Check if all commits comply with the specification
         uses: webiny/action-conventional-commits@v1.3.0
+
+  no_merge_commits:
+    name: No merge commits check 🚫
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout ⬇️
+        uses: actions/checkout@v4.1.1
+        with:
+          show-progress: false
+          fetch-depth: 0
+
+      - name: Check commits
+        uses: greenled/no-merge-commits-check@v1.0.1
