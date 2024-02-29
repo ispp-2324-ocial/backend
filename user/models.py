@@ -12,8 +12,8 @@ class OcialUser(models.Model):
         LIVE_CONCERTS = 4, ('Lice concerts')
 
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    lastKnowLocLat = models.FloatField()
-    lastKnowLocLong = models.FloatField()
+    lastKnowLocLat = models.FloatField(default=0.0)
+    lastKnowLocLong = models.FloatField(default=0.0)
     typesfavEventType = models.TextField(
         choices=TypesfavEvent.choices,
         default=TypesfavEvent.SPORTS
