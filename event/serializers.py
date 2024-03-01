@@ -29,6 +29,12 @@ class EventCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = '__all__'
+    
+class EventNearbySerializer(serializers.Serializer):
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    radius = serializers.FloatField()
+
 
 
 

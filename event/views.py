@@ -5,6 +5,11 @@ from drf_spectacular.openapi import OpenApiResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import *
+from django.db.models import FloatField
+from django.db.models.functions import ACos, Cos, Radians, Sin, Sqrt
+from django.db.models import F
+from django.db.models.functions import ACos, Cos, Radians, Sin
+
 
 # Create your views here.
 from .models import(
@@ -187,4 +192,57 @@ class RatingUpdate(generics.UpdateAPIView):
     )
     def put(self, request, *args, **kwargs):
         return super().put(request, *args, **kwargs)
-    
+
+
+from drf_spectacular.utils import OpenApiParameter
+
+class EventNearby(generics.ListAPIView):
+    serializer_class = EventNearbySerializer
+
+    @extend_schema(
+        description="List of events near a location",
+        parameters=[
+            OpenApiParameter(name='latitude', type=float, description='Latitude of the center point', required=True),
+            OpenApiParameter(name='longitude', type=float, description='Longitude of the center point', required=True),
+            OpenApiParameter(name='radius', type=float, description='Radius in kilometers', required=True),
+        ],
+        responses={
+            200: OpenApiResponse(response=EventSerializer(many=True)),
+            400: OpenApiResponse(response=None, description="Error in request")
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        latitude = serializer.validated_data['latitude']
+        longitude = serializer.validated_data['longitude']
+        radius = serializer.validated_data['radius']
+
+        lat_change = radius / 111.0  # Approximately 111 kilometers per degree of latitude
+        lng_change = radius / (111.0 * Cos(Radians(latitude)))
+
+        min_lat = latitude - lat_change
+        max_lat = latitude + lat_change
+        min_lng = longitude - lng_change
+        max_lng = longitude + lng_change
+
+        # Calculate the distance from the center point to each event and filter those within the radius
+        events = Event.objects.annotate(
+            lat_diff=Radians(F('latitude') - latitude),
+            lng_diff=Radians(F('longitude') - longitude),
+            distance=6371 * ACos(
+                Cos(Radians(latitude)) * Cos(Radians(F('latitude'))) *
+                Cos(Radians(F('longitude')) - Radians(longitude)) +
+                Sin(Radians(latitude)) * Sin(Radians(F('latitude')))
+            )
+        ).filter(
+            latitude__gte=min_lat,
+            latitude__lte=max_lat,
+            longitude__gte=min_lng,
+            longitude__lte=max_lng,
+            distance__lte=radius
+        )
+
+        serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
