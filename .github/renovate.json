@@ -1,0 +1,60 @@
+{
+  "timezone": "Europe/Madrid",
+  "packageRules": [
+    {
+      "matchManagers": [
+        "pip_requirements"
+      ],
+      "groupName": "Python dependencies",
+      "groupSlug": "python-deps"
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "separateMajorMinor": false,
+      "groupName": "CI dependencies",
+      "groupSlug": "ci-deps"
+    }
+  ],
+  "dependencyDashboard": true,
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "transitiveRemediation": true,
+  "osvVulnerabilityAlerts": true,
+  "baseBranches": [
+    "develop"
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "groupName": "vulnerable dependencies",
+    "groupSlug": "vulnerabilities",
+    "labels": [
+      "security",
+      "dependencies"
+    ]
+  },
+  "enabledManagers": [
+    "pip_requirements",
+    "github-actions"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "rebaseWhen": "behind-base-branch",
+  "rangeStrategy": "pin",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "every month"
+    ]
+  },
+  "assignees": [
+    "adrrf",
+    "raumonmar1"
+  ],
+  "reviewers": [
+    "adrrf",
+    "raumonmar1"
+  ]
+}
