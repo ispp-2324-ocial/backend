@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:pk>/delete/', views.EventDelete.as_view(), name='event_delete'),
     path('rating/<int:pk>/delete/', views.RatingDelete.as_view(), name='rating_delete'),
     path('nearby/', views.EventNearby.as_view(), name='event_nearby'),
+    path('<int:pk>/update/', views.EventUpdate.as_view(), name='event_update')
 ]

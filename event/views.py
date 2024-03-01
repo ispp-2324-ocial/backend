@@ -90,7 +90,7 @@ class EventCreate(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class EventDelete(generics.DestroyAPIView):
-    serializer_class = EventSerializer
+    
 
     @extend_schema(
         description="Delete an event",
@@ -101,36 +101,59 @@ class EventDelete(generics.DestroyAPIView):
     )
     def delete(self, request, *args, **kwargs):
         
-        event = request.data.get('event')
-        serializer = EventSerializer()
-        if serializer.is_valid():
-            serializer.delete(event)
-            return Response(status=status.HTTP_201_CREATED)
+        if not User.objects.filter(id=request.user.id).exists():
+            return Response({"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        ocialClient = OcialClient.objects.filter(usuario=request.user)
+        eventAct = Event.objects.filter(id=kwargs['pk'])
+        if not (ocialClient[0].id == eventAct[0].ocialClient.id):
+            return Response({"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN)
+        
+        
+        if eventAct.exists():
+            eventAct.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     
 class EventUpdate(generics.UpdateAPIView):
-    queryset = Event.objects.all()
-    serializer_class = EventSerializer
+    permission_classes = [permissions.AllowAny]
 
     @extend_schema(
-        description="Update an existing event",
+        request=EventCreateSerializer,
+        description="Update a new event",
         responses={
-            200: OpenApiResponse(response=EventSerializer()),
-            400: OpenApiResponse(response=None, description="Error in request"),
-            404: OpenApiResponse(response=None, description="Event not found"),
+            201: OpenApiResponse(response=None),
+            400: OpenApiResponse(response=None, description="Error in request")
         }
     )
-    def put(self, request, *args, **kwargs):
-        
-        event = request.data.get('event')
-        client = request.data.get('ocial_client')
-        serializer = EventSerializer()
+    def put(self, request, *args, **kwargs):       
+        if not User.objects.filter(id=request.user.id).exists():
+            return Response({"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if serializer.is_valid() and (event['ocial_client'] == client):
-            serializer.save(event)
-            event.save()
-            return Response(status=status.HTTP_201_CREATED)
+        request.data.pop('ocialClient')
+        ocialClient = OcialClient.objects.filter(usuario=request.user)
+        if not ocialClient:
+            return Response({"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN)
+        ocialClient = ocialClient[0]
+        request.data['ocialClient'] = ocialClient.id
+        serializer = EventCreateSerializer(data=request.data)
+
+        if serializer.is_valid():
+            name = request.data.get('name')
+            place = request.data.get('place')
+            event = request.data.get('event')
+            date = request.data.get('date')
+            hour = request.data.get('hour')
+            capacity = request.data.get('capacity')
+            category = request.data.get('category')
+            latitude = request.data.get('latitude')
+            longitude = request.data.get('longitude')
+            eventUpdate = Event.objects.filter(id=kwargs['pk'])
+            eventUpdate = Event.objects.update(name=name, place=place, event=event, date=date, hour=hour,
+            capacity=capacity, category=category, latitude=latitude, longitude=longitude, ocialClient=ocialClient)
+            eventUpdate.save()            
+            return Response(status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
