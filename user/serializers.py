@@ -42,21 +42,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = OcialUser
         fields = '__all__'
-
-class LoginClientSerializer(serializers.Serializer):
-    """
-    Serializer for user login.
-
-    Fields:
-    - `username` (string): The username of the user.
-    - `password` (string): The password of the user.
-    """
-
-    model = OcialClient
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
         
-class LoginUserSerializer(serializers.Serializer):
+class LoginUserSerializer(serializers.ModelSerializer):
     """
     Serializer for user login.
 
@@ -65,6 +52,6 @@ class LoginUserSerializer(serializers.Serializer):
     - `password` (string): The password of the user.
     """
 
-    model = OcialUser
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
+    class Meta:
+        model = User
+        fields = ('username', 'password')
