@@ -16,25 +16,6 @@ from .models import(
     Rating
 )
 
-class EventValidation(generics.ListAPIView):
-    queryset = Event.objects.all()
-    serializer_class = EventSerializer
-
-    @extend_schema(
-        description="Validate an Event",
-        responses={
-            200: OpenApiResponse(response=EventSerializer(many=True)),
-            400: OpenApiResponse(response=None, description="Error in request")
-        }
-    )
-    def get(self, request, *args, **kwargs):
-        serializer = EventSerializer()
-        if serializer.is_valid() and (request.data.get('ocial_client') == request.data.get('event').get('ocial_client')):
-            serializer.get() #coger sus eventos
-            return Response(status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class EventList(generics.ListAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
@@ -48,7 +29,28 @@ class EventList(generics.ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
-    
+
+class EventListByClient(generics.ListAPIView):
+    serializer_class = EventSerializer
+    @extend_schema(
+        description="List of events by client id",
+        responses={
+            200: OpenApiResponse(response=EventSerializer(many=True)),
+            400: OpenApiResponse(response=None, description="Error in request")
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        if not User.objects.filter(id=request.user.id).exists():
+            return Response({"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get list of events if client has events, otherwise []
+        ocialClient = OcialClient.objects.filter(usuario=kwargs['pk'])
+        if ocialClient:
+            events = Event.objects.filter(ocialClient=ocialClient[0].id)
+            serialized_events = [EventSerializer(event).data for event in events]
+            return Response(serialized_events, status=status.HTTP_200_OK)
+        return Response([], status=status.HTTP_200_OK)
+
 class EventCreate(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
@@ -122,7 +124,7 @@ class EventUpdate(generics.UpdateAPIView):
 
     @extend_schema(
         request=EventSerializer,
-        description="Update a new event",
+        description="Update an event",
         responses={
             201: OpenApiResponse(response=None),
             400: OpenApiResponse(response=None, description="Error in request")
@@ -157,6 +159,8 @@ class EventUpdate(generics.UpdateAPIView):
             return Response(status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#TODO Rating Methods
 
 class RatingList(generics.ListAPIView):
     queryset = Rating.objects.all()
