@@ -37,4 +37,9 @@ class EventNearbySerializer(serializers.Serializer):
 
 
 
+class EventDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['id']
+
 
