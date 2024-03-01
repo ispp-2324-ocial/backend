@@ -243,5 +243,5 @@ class EventNearby(generics.ListAPIView):
             distance__lte=radius
         )
 
-        serializer = self.get_serializer(events, many=True)
+        serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
