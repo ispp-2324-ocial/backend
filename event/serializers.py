@@ -14,17 +14,13 @@ class RatingCreateSerializer(serializers.ModelSerializer):
         model = Rating
         fields = '__all__'
 
-class EventSerializer(serializers.ModelSerializer):
+class EventUpdateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Event
         fields = '__all__'
-
-class OcialClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OcialClient
-        fields = '__all__'
         
-class EventCreateSerializer(serializers.ModelSerializer):
+class EventSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Event
@@ -35,11 +31,5 @@ class EventNearbySerializer(serializers.Serializer):
     longitude = serializers.FloatField()
     radius = serializers.FloatField()
 
-
-
-class EventDeleteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = ['id']
 
 
