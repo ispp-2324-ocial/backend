@@ -53,7 +53,7 @@ class EventCreate(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
     @extend_schema(
-        request=EventCreateSerializer,
+        request=EventSerializer,
         description="Create a new event",
         responses={
             201: OpenApiResponse(response=None),
@@ -70,7 +70,7 @@ class EventCreate(generics.CreateAPIView):
             return Response({"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN)
         ocialClient = ocialClient[0]
         request.data['ocialClient'] = ocialClient.id
-        serializer = EventCreateSerializer(data=request.data)
+        serializer = EventSerializer(data=request.data)
 
         if serializer.is_valid():
             name = request.data.get('name')
@@ -118,40 +118,41 @@ class EventDelete(generics.DestroyAPIView):
     
 class EventUpdate(generics.UpdateAPIView):
     permission_classes = [permissions.AllowAny]
+    serializer_class = EventSerializer
 
     @extend_schema(
-        request=EventCreateSerializer,
+        request=EventSerializer,
         description="Update a new event",
         responses={
             201: OpenApiResponse(response=None),
             400: OpenApiResponse(response=None, description="Error in request")
         }
     )
-    def put(self, request, *args, **kwargs):       
+
+    def put(self, request, *args, **kwargs):      
         if not User.objects.filter(id=request.user.id).exists():
             return Response({"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST)
 
         request.data.pop('ocialClient')
         ocialClient = OcialClient.objects.filter(usuario=request.user)
-        if not ocialClient:
+        eventAct = Event.objects.filter(id=kwargs['pk'])
+        if not (ocialClient[0].id == eventAct[0].ocialClient.id):
             return Response({"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN)
         ocialClient = ocialClient[0]
         request.data['ocialClient'] = ocialClient.id
-        serializer = EventCreateSerializer(data=request.data)
+        serializer = EventSerializer(data=request.data)
 
         if serializer.is_valid():
-            name = request.data.get('name')
-            place = request.data.get('place')
-            event = request.data.get('event')
-            date = request.data.get('date')
-            hour = request.data.get('hour')
-            capacity = request.data.get('capacity')
-            category = request.data.get('category')
-            latitude = request.data.get('latitude')
-            longitude = request.data.get('longitude')
-            eventUpdate = Event.objects.filter(id=kwargs['pk'])
-            eventUpdate = Event.objects.update(name=name, place=place, event=event, date=date, hour=hour,
-            capacity=capacity, category=category, latitude=latitude, longitude=longitude, ocialClient=ocialClient)
+            eventUpdate = Event.objects.filter(id=kwargs['pk'])[0]
+            eventUpdate.name = request.data.get('name')
+            eventUpdate.place = request.data.get('place')
+            eventUpdate.event = request.data.get('event')
+            eventUpdate.date = request.data.get('date')
+            eventUpdate.hour = request.data.get('hour')
+            eventUpdate.capacity = request.data.get('capacity')
+            eventUpdate.category = request.data.get('category')
+            eventUpdate.latitude = request.data.get('latitude')
+            eventUpdate.longitude = request.data.get('longitude')
             eventUpdate.save()            
             return Response(status=status.HTTP_200_OK)
 

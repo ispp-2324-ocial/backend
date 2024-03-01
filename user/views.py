@@ -121,6 +121,7 @@ class LogoutUserView(APIView):
 
         # Eliminar el token de autenticación
         token.delete()
+        logout(request)
 
         return Response(status=status.HTTP_200_OK)
     
