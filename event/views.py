@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics, status, permissions
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.openapi import OpenApiResponse 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,7 +8,6 @@ from .serializers import *
 from django.db.models import FloatField
 from django.db.models.functions import ACos, Cos, Radians, Sin, Sqrt
 from django.db.models import F
-from django.db.models.functions import ACos, Cos, Radians, Sin
 
 
 # Create your views here.
