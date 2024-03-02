@@ -11,8 +11,7 @@ jobs:
       - name: Lint
         uses: psf/black@stable
         with:
-          jupyter: false
-          options: "--check --verbose"
+            options: "-t py312"
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
