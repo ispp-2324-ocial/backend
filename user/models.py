@@ -22,7 +22,6 @@ class OcialUser(models.Model):
         return self.usuario.username
 
     def save(self, *args, **kwargs):
-        not self.pk
         super().save(*args, **kwargs)
 
 
@@ -47,5 +46,4 @@ class OcialClient(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        not self.pk
         super().save(*args, **kwargs)
