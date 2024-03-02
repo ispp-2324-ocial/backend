@@ -1,23 +1,26 @@
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from .models import Event, Rating
-from user.models import OcialClient, OcialUser
+from user.models import OcialClient
 from django.contrib.auth.models import User
 from .views import *
 
 # Create your tests here.
 
+
 class EventListTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
-        self.user_3 = User.objects.create_user('ocialuser3', 'chevy@chase.com', 'chevyspassword')
+        self.user_3 = User.objects.create_user(
+            "ocialuser3", "chevy@chase.com", "chevyspassword"
+        )
         self.client1 = OcialClient.objects.create(
-            usuario = self.user_3,
-            name = 'A',
-            identification_document = 'X1234567A', #nie
-            typeClient = OcialClient.TypeClient.BAR_RESTAURANT,
-            default_latitude = 40.7128,
-            default_longitude = 0.0
+            usuario=self.user_3,
+            name="A",
+            identification_document="X1234567A",  # nie
+            typeClient=OcialClient.TypeClient.BAR_RESTAURANT,
+            default_latitude=40.7128,
+            default_longitude=0.0,
         )
         self.event1 = Event.objects.create(
             name="Football Match",
@@ -29,7 +32,7 @@ class EventListTestCase(TestCase):
             category=Event.Category.SPORTS,
             latitude=40.7128,
             longitude=-74.0060,
-            ocialClient = self.client1
+            ocialClient=self.client1,
         )
         self.event2 = Event.objects.create(
             name="Music Festival",
@@ -41,9 +44,8 @@ class EventListTestCase(TestCase):
             category=Event.Category.MUSIC,
             latitude=34.0522,
             longitude=-118.2437,
-            ocialClient = self.client1
+            ocialClient=self.client1,
         )
-
 
     def test_event_list(self):
         view = EventList.as_view()
@@ -52,7 +54,8 @@ class EventListTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.data
         self.assertEqual(len(data), 2)  # Verificar que se devuelvan todos los event
-        
+
+
 class RatingListTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -67,16 +70,18 @@ class RatingListTestCase(TestCase):
         data = response.data
         self.assertEqual(len(data), 2)  # Verificar que se devuelvan todos los rating
 
+
 class EventCreateTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
 
     def test_event_create(self):
         view = EventCreate.as_view()
-        request = self.factory.post("/event/create/", {'id': 1})
+        request = self.factory.post("/event/create/", {"id": 1})
         response = view(request)
         self.assertEqual(response.status_code, 201)
         # Verificar si el event se ha creado correctamente
+
 
 class RatingCreateTestCase(TestCase):
     def setUp(self):
@@ -85,10 +90,13 @@ class RatingCreateTestCase(TestCase):
 
     def test_rating_create(self):
         view = RatingCreate.as_view()
-        request = self.factory.post("/rating/1/create/", {'content': 'New rating', 'event': self.event.id})
+        request = self.factory.post(
+            "/rating/1/create/", {"content": "New rating", "event": self.event.id}
+        )
         response = view(request)
         self.assertEqual(response.status_code, 201)
         # Verificar si el rating se ha creado correctamente
+
 
 class EventDeleteTestCase(TestCase):
     def setUp(self):
@@ -101,6 +109,7 @@ class EventDeleteTestCase(TestCase):
         response = view(request, pk=self.event.id)
         self.assertEqual(response.status_code, 204)
         self.assertFalse(Event.objects.filter(id=self.event.id).exists())
+
 
 class RatingDeleteTestCase(TestCase):
     def setUp(self):

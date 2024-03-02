@@ -16,25 +16,80 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='OcialUser',
+            name="OcialUser",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('lastKnowLocLat', models.FloatField(default=0.0)),
-                ('lastKnowLocLong', models.FloatField(default=0.0)),
-                ('typesfavEventType', models.TextField(choices=[('0', 'Sports'), ('1', 'Music'), ('2', 'Markets'), ('3', 'Relax activities'), ('4', 'Live concerts')], default='0')),
-                ('usuario', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("lastKnowLocLat", models.FloatField(default=0.0)),
+                ("lastKnowLocLong", models.FloatField(default=0.0)),
+                (
+                    "typesfavEventType",
+                    models.TextField(
+                        choices=[
+                            ("0", "Sports"),
+                            ("1", "Music"),
+                            ("2", "Markets"),
+                            ("3", "Relax activities"),
+                            ("4", "Live concerts"),
+                        ],
+                        default="0",
+                    ),
+                ),
+                (
+                    "usuario",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='OcialClient',
+            name="OcialClient",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField()),
-                ('identification_document', localflavor.es.models.ESIdentityCardNumberField(max_length=9)),
-                ('typeClient', models.TextField(choices=[('0', 'Small business'), ('1', 'Artist'), ('2', 'Bar Restaurant'), ('3', 'Local Guide'), ('4', 'Events And Concerts')], default='0')),
-                ('default_latitude', models.FloatField()),
-                ('default_longitude', models.FloatField()),
-                ('usuario', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.TextField()),
+                (
+                    "identification_document",
+                    localflavor.es.models.ESIdentityCardNumberField(max_length=9),
+                ),
+                (
+                    "typeClient",
+                    models.TextField(
+                        choices=[
+                            ("0", "Small business"),
+                            ("1", "Artist"),
+                            ("2", "Bar Restaurant"),
+                            ("3", "Local Guide"),
+                            ("4", "Events And Concerts"),
+                        ],
+                        default="0",
+                    ),
+                ),
+                ("default_latitude", models.FloatField()),
+                ("default_longitude", models.FloatField()),
+                (
+                    "usuario",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

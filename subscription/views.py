@@ -1,9 +1,7 @@
-from django.shortcuts import render
-from rest_framework import generics, status
+from rest_framework import generics
 
-from subscription.models import(
-    Subscription
-)
+from subscription.models import Subscription
+
 
 class SubscriptionView(generics.LisTAPIView):
     def get():

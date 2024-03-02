@@ -6,23 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0001_initial'),
+        ("user", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='ocialuser',
-            name='lastKnowLocLat',
+            model_name="ocialuser",
+            name="lastKnowLocLat",
             field=models.FloatField(),
         ),
         migrations.AlterField(
-            model_name='ocialuser',
-            name='lastKnowLocLong',
+            model_name="ocialuser",
+            name="lastKnowLocLong",
             field=models.FloatField(),
         ),
         migrations.AlterField(
-            model_name='ocialuser',
-            name='typesfavEventType',
-            field=models.TextField(choices=[('0', 'Sports'), ('1', 'Music'), ('2', 'Markets'), ('3', 'Relax activities'), ('4', 'Lice concerts')], default='0'),
+            model_name="ocialuser",
+            name="typesfavEventType",
+            field=models.TextField(
+                choices=[
+                    ("0", "Sports"),
+                    ("1", "Music"),
+                    ("2", "Markets"),
+                    ("3", "Relax activities"),
+                    ("4", "Lice concerts"),
+                ],
+                default="0",
+            ),
         ),
     ]

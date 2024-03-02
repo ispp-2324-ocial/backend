@@ -1,11 +1,7 @@
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
-from base64 import b64encode
-from drf_spectacular.utils import extend_schema_field
-from drf_spectacular.types import OpenApiTypes
-from user.models import OcialClient, OcialUser  
+from user.models import OcialClient, OcialUser
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
+
 
 class DjangoUserSerializer(serializers.ModelSerializer):
     """
@@ -22,27 +18,29 @@ class DjangoUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = "__all__"
+
 
 class ClientSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     email = serializers.EmailField(write_only=True, required=False)
     username = serializers.CharField(write_only=True)
-    
+
     class Meta:
         model = OcialClient
-        fields = '__all__'
-        
+        fields = "__all__"
+
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     email = serializers.EmailField(write_only=True, required=False)
     username = serializers.CharField(write_only=True)
-    
+
     class Meta:
         model = OcialUser
-        fields = '__all__'
-        
+        fields = "__all__"
+
+
 class LoginUserSerializer(serializers.ModelSerializer):
     """
     Serializer for user login.
@@ -54,4 +52,4 @@ class LoginUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password')
+        fields = ("username", "password")

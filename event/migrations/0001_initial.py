@@ -10,33 +10,84 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('user', '0001_initial'),
+        ("user", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Event',
+            name="Event",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField()),
-                ('place', models.TextField()),
-                ('event', models.TextField()),
-                ('date', models.DateField()),
-                ('hour', models.TimeField()),
-                ('capacity', models.PositiveIntegerField(default=0)),
-                ('category', models.TextField(choices=[('0', 'Sports'), ('1', 'Music'), ('2', 'Markets'), ('3', 'Relax activities'), ('4', 'Live concert')], default='0')),
-                ('latitude', models.FloatField()),
-                ('longitude', models.FloatField()),
-                ('ocialClient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='OcialClient', to='user.ocialclient')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.TextField()),
+                ("place", models.TextField()),
+                ("event", models.TextField()),
+                ("date", models.DateField()),
+                ("hour", models.TimeField()),
+                ("capacity", models.PositiveIntegerField(default=0)),
+                (
+                    "category",
+                    models.TextField(
+                        choices=[
+                            ("0", "Sports"),
+                            ("1", "Music"),
+                            ("2", "Markets"),
+                            ("3", "Relax activities"),
+                            ("4", "Live concert"),
+                        ],
+                        default="0",
+                    ),
+                ),
+                ("latitude", models.FloatField()),
+                ("longitude", models.FloatField()),
+                (
+                    "ocialClient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="OcialClient",
+                        to="user.ocialclient",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Rating',
+            name="Rating",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('score', models.PositiveIntegerField(default=0, validators=[django.core.validators.MaxValueValidator(5), django.core.validators.MinValueValidator(0)])),
-                ('comment', models.TextField(blank=True, null=True)),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='Rating', to='event.event')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "score",
+                    models.PositiveIntegerField(
+                        default=0,
+                        validators=[
+                            django.core.validators.MaxValueValidator(5),
+                            django.core.validators.MinValueValidator(0),
+                        ],
+                    ),
+                ),
+                ("comment", models.TextField(blank=True, null=True)),
+                (
+                    "event",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="Rating",
+                        to="event.event",
+                    ),
+                ),
             ],
         ),
     ]
