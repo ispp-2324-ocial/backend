@@ -7,7 +7,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import logout
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import UserCreationForm
 from .serializers import *
+from .models import OcialClientForm
+from .models import OcialUserForm
 
 
 class RegisterUserView(APIView):
@@ -26,8 +30,6 @@ class RegisterUserView(APIView):
         },
     )
     def post(self, request):
-
-        serializer = UserSerializer(data=request.data)
         username = request.data.get("username")
         password = request.data.get("password")
         email = request.data.get("email")
@@ -38,44 +40,32 @@ class RegisterUserView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-        user_created = User.objects.create_user(
-            username=username, password=password, email=email
-        )
-
         data = request.data
-        data["usuario"] = user_created.id
-
-        serializer = UserSerializer(data=data)
-
-        if serializer.is_valid():
-            data.pop("username")
-            data.pop("password")
-            data.pop("email")
-
-            # Crear un nuevo OcialUser
-            ocial_user = OcialUser.objects.create(
-                lastKnowLocLat=data.get("lastKnowLocLat"),
-                lastKnowLocLong=data.get("lastKnowLocLong"),
-                typesfavEventType=data.get("typesfavEventType"),
-                usuario_id=user_created.id,
+        userdata ={"username":username,"password1":password,"password2":password,"email":email}
+        form = UserCreationForm(userdata) 
+        if form.is_valid():
+            userCreated = form.save()
+            ocialuserdata = {"lastKnowLocLat":data.get("lastKnowLocLat"),
+                "lastKnowLocLong":data.get("lastKnowLocLong"),
+                "typesfavEventType":data.get("typesfavEventType"),
+                "usuario":userCreated
+                }
+            ocialuserform = OcialUserForm(ocialuserdata)
+            if ocialuserform.is_valid():     
+                ocialuserform.save()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                userCreated.delete()
+                return Response(
+                {"errors": ocialuserform.errors},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-            # Iniciar sesión automáticamente después del registro
-            login(request, user_created)
-
-            return Response(status=status.HTTP_200_OK)
-
-        # Verificar específicamente si el error es debido al nombre de usuario duplicado
-        if (
-            "username" in serializer.errors
-            and "Ya existe un usuario con este nombre." in serializer.errors["username"]
-        ):
+        else:
             return Response(
-                {"error": "El nombre de usuario ya existe"},
-                status=status.HTTP_409_CONFLICT,
+                {"errors": form.errors},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginUserView(APIView):
@@ -174,7 +164,6 @@ class RegisterClientView(APIView):
         },
     )
     def post(self, request):
-        serializer = ClientSerializer(data=request.data)
         username = request.data.get("username")
         password = request.data.get("password")
         email = request.data.get("email")
@@ -185,49 +174,38 @@ class RegisterClientView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-        userCreated = User.objects.create_user(
-            username=username, password=password, email=email
-        )
-        userCreated.set_password(request.data.get("password"))
-        userCreated.save()
-
         data = request.data
-        data["usuario"] = userCreated.id
-
-        serializer = ClientSerializer(data=data)
-
-        if serializer.is_valid():
-            # Verificar si el nombre de usuario ya existe
-            data.pop("username")
-            data.pop("password")
-            data.pop("email")
-
-            ocial_client = OcialClient.objects.create(
-                name=data.get("name"),
-                identification_document=data.get("identification_document"),
-                typeClient=data.get("typeClient"),
-                default_latitude=data.get("default_latitude"),
-                default_longitude=data.get("default_longitude"),
-                usuario=userCreated,
+        userdata ={"username":username,"password1":password,"password2":password,"email":email}
+        form = UserCreationForm(userdata) 
+        if form.is_valid():
+            userCreated = form.save()
+            ocialclientdata = {"name":data.get("name"),
+                "identification_document":data.get("identification_document"),
+                "typeClient":data.get("typeClient"),
+                "default_latitude":data.get("default_latitude"),
+                "default_longitude":data.get("default_longitude"),
+                "usuario":userCreated
+                }
+            ocialclientform = OcialClientForm(ocialclientdata)
+            if ocialclientform.is_valid():     
+                samenif = OcialClient.objects.filter(identification_document=data.get("identification_document"))     
+                if samenif:
+                    return Response(
+                    {"errors": "Este documento de identificación ya se encuentra registrado"},
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
+                ocialclientform.save()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                userCreated.delete()
+                return Response(
+                {"errors": ocialclientform.errors},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-            user_instance = User.objects.get(pk=userCreated.id)
-            ocial_client.usuario = user_instance
-            ocial_client.save()
-
-            # Iniciar sesión automáticamente después del registro
-            login(request, userCreated)
-
-            return Response(status=status.HTTP_200_OK)
-
-        # Verificar específicamente si el error es debido al nombre de usuario duplicado
-        if (
-            "username" in serializer.errors
-            and "Ya existe un usuario con este nombre." in serializer.errors["username"]
-        ):
+        else:
             return Response(
-                {"error": "El nombre de usuario ya existe"},
-                status=status.HTTP_409_CONFLICT,
+                {"errors": form.errors},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+ 

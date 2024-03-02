@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from localflavor.es.models import ESIdentityCardNumberField
+from django.forms import ModelForm
 
 
 class OcialUser(models.Model):
@@ -47,3 +48,13 @@ class OcialClient(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+class OcialClientForm(ModelForm):
+    class Meta:
+        model = OcialClient
+        fields = "__all__"
+
+class OcialUserForm(ModelForm):
+    class Meta:
+        model = OcialUser
+        fields = "__all__"
