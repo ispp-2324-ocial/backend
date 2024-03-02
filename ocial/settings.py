@@ -10,7 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-s2x)tztp!#lu7^=8qq1&kuq1j*rbk-0a31zg!35et)x&9inc#2"
+SECRET_KEY = os.environ['KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ['DEBUG'] == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -38,9 +43,7 @@ REST_FRAMEWORK = {
 # Application definition
 
 INSTALLED_APPS = [
-    "subscription",
     "event",
-    "subscription",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -65,7 +68,8 @@ SWAGGER_SETTINGS = {
 
 SPECTACULAR_SETTINGS = {
     "SCHEMA_PATH_PREFIX": "/api",
-    "TITLE": "TraineerBook API",
+    "TITLE": "Ocial API",
+    "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_COERCE_PATH_PK_SUFFIX": True,
     "COMPONENT_NO_READ_ONLY_REQUIRED": True,
@@ -109,11 +113,11 @@ WSGI_APPLICATION = "ocial.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "ocialdb",
-        "USER": "ocialuser",
-        "PASSWORD": "ocialpass123",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": os.environ['DB_NAME'],
+        "USER": os.environ['DB_USERNAME'],
+        "PASSWORD": os.environ['DB_PASSWORD'],
+        "HOST": os.environ['DB_HOST'],
+        "PORT": os.environ['DB_PORT'],
     }
 }
 

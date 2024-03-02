@@ -5,10 +5,12 @@ from rest_framework.response import Response
 from .serializers import *
 from django.db.models.functions import ACos, Cos, Radians, Sin
 from django.db.models import F
+from django.contrib.auth.models import User
+from user.models import OcialClient, OcialUser
 
 
 # Create your views here.
-from .models import Event, Rating
+from .models import Event, Rating, OcialClient
 
 
 class EventList(generics.ListAPIView):

@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import logout
 from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
 from .serializers import *
 
 
@@ -25,7 +26,6 @@ class RegisterUserView(APIView):
         },
     )
     def post(self, request):
-        User = get_user_model()
 
         serializer = UserSerializer(data=request.data)
         username = request.data.get("username")
@@ -185,7 +185,7 @@ class RegisterClientView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-        userCreated = get_user_model().objects.create_user(
+        userCreated = User.objects.create_user(
             username=username, password=password, email=email
         )
         userCreated.set_password(request.data.get("password"))
