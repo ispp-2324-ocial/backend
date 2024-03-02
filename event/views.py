@@ -6,7 +6,7 @@ from .serializers import *
 from django.db.models.functions import ACos, Cos, Radians, Sin
 from django.db.models import F
 from django.contrib.auth.models import User
-from user.models import OcialClient, OcialUser
+from user.models import OcialClient
 
 
 # Create your views here.
