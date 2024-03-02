@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from user.models import OcialClient
+from django.forms import ModelForm
 
 
 # Create your models here.
@@ -69,3 +70,8 @@ class Rating(models.Model):
             self.score
             self.comment
             self.event
+
+class OcialEventForm(ModelForm):
+    class Meta:
+        model = Event
+        fields = "__all__"
