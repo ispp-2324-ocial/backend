@@ -85,12 +85,6 @@ class EventCreate(generics.CreateAPIView):
                      "latitude":data.get("latitude"),"longitude":data.get("longitude"),"ocialClient":data.get("ocialClient")}
         eventform = OcialEventForm(eventdata)
         if eventform.is_valid():
-            samename = Event.objects.filter(name=data.get("name"))     
-            if samename:
-                return Response(
-                {"errors": "Ya existe un evento creado con el mismo nombre"},
-                status=status.HTTP_400_BAD_REQUEST
-                )
             eventform.save()
             return Response(status=status.HTTP_200_OK)
         else:
