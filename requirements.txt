@@ -1,6 +1,6 @@
 asgiref==3.6.0
-channels==3.0.4
-django==4.2.10
+channels==4.0.0
+django==5.0.2
 django-environ==0.11.2
 djangorestframework==3.14.0
 mypy==1.8.0
