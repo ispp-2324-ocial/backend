@@ -7,7 +7,7 @@ from django.db.models.functions import ACos, Cos, Radians, Sin
 from django.db.models import F
 from django.contrib.auth.models import User
 from user.models import OcialClient
-
+from .models import OcialEventForm
 
 # Create your views here.
 from .models import Event, Rating, OcialClient
@@ -78,34 +78,26 @@ class EventCreate(generics.CreateAPIView):
             )
         ocialClient = ocialClient[0]
         request.data["ocialClient"] = ocialClient.id
-        serializer = EventSerializer(data=request.data)
+        data = request.data
 
-        if serializer.is_valid():
-            name = request.data.get("name")
-            place = request.data.get("place")
-            event = request.data.get("event")
-            date = request.data.get("date")
-            hour = request.data.get("hour")
-            capacity = request.data.get("capacity")
-            category = request.data.get("category")
-            latitude = request.data.get("latitude")
-            longitude = request.data.get("longitude")
-            eventCreated = Event.objects.create(
-                name=name,
-                place=place,
-                event=event,
-                date=date,
-                hour=hour,
-                capacity=capacity,
-                category=category,
-                latitude=latitude,
-                longitude=longitude,
-                ocialClient=ocialClient,
-            )
-            eventCreated.save()
+        eventdata = {"name":data.get("name"),"place":data.get("place"),"event":data.get("event"),"date":data.get("date"),
+                     "hour":data.get("hour"),"capacity":data.get("capacity"),"category":data.get("category"),
+                     "latitude":data.get("latitude"),"longitude":data.get("longitude"),"ocialClient":data.get("ocialClient")}
+        eventform = OcialEventForm(eventdata)
+        if eventform.is_valid():
+            samename = Event.objects.filter(name=data.get("name"))     
+            if samename:
+                return Response(
+                {"errors": "Ya existe un evento creado con el mismo nombre"},
+                status=status.HTTP_400_BAD_REQUEST
+                )
+            eventform.save()
             return Response(status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(
+                {"errors": eventform.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+                )
 
 
 class EventDelete(generics.DestroyAPIView):
@@ -161,27 +153,30 @@ class EventUpdate(generics.UpdateAPIView):
         eventAct = Event.objects.filter(id=kwargs["pk"])
         if not (ocialClient[0].id == eventAct[0].ocialClient.id):
             return Response(
-                {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
+                {"error": "No puedes actualizar datos de un evento de otro cliente"}, status=status.HTTP_403_FORBIDDEN
             )
         ocialClient = ocialClient[0]
         request.data["ocialClient"] = ocialClient.id
-        serializer = EventSerializer(data=request.data)
+        data = request.data
 
-        if serializer.is_valid():
-            eventUpdate = Event.objects.filter(id=kwargs["pk"])[0]
-            eventUpdate.name = request.data.get("name")
-            eventUpdate.place = request.data.get("place")
-            eventUpdate.event = request.data.get("event")
-            eventUpdate.date = request.data.get("date")
-            eventUpdate.hour = request.data.get("hour")
-            eventUpdate.capacity = request.data.get("capacity")
-            eventUpdate.category = request.data.get("category")
-            eventUpdate.latitude = request.data.get("latitude")
-            eventUpdate.longitude = request.data.get("longitude")
+        eventdata = {"name":data.get("name"),"place":data.get("place"),"event":data.get("event"),"date":data.get("date"),
+                     "hour":data.get("hour"),"capacity":data.get("capacity"),"category":data.get("category"),
+                     "latitude":data.get("latitude"),"longitude":data.get("longitude"),"ocialClient":data.get("ocialClient")}
+        eventform = OcialEventForm(eventdata)
+        if eventform.is_valid():
+            eventUpdate = Event.objects.filter(id=kwargs["pk"])[0]    
+            eventUpdate.name = data.get("name")
+            eventUpdate.place = data.get("place")
+            eventUpdate.event = data.get("event")
+            eventUpdate.date = data.get("date")
+            eventUpdate.hour = data.get("hour")
+            eventUpdate.capacity = data.get("capacity")
+            eventUpdate.category = data.get("category")
+            eventUpdate.latitude = data.get("latitude")
+            eventUpdate.longitude = data.get("longitude")
             eventUpdate.save()
             return Response(status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(eventform.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # TODO Rating Methods
