@@ -7,7 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import logout
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
 from .serializers import *
 from .models import OcialClientForm
@@ -41,25 +40,31 @@ class RegisterUserView(APIView):
             )
 
         data = request.data
-        userdata ={"username":username,"password1":password,"password2":password,"email":email}
-        form = UserCreationForm(userdata) 
+        userdata = {
+            "username": username,
+            "password1": password,
+            "password2": password,
+            "email": email,
+        }
+        form = UserCreationForm(userdata)
         if form.is_valid():
             userCreated = form.save()
-            ocialuserdata = {"lastKnowLocLat":data.get("lastKnowLocLat"),
-                "lastKnowLocLong":data.get("lastKnowLocLong"),
-                "typesfavEventType":data.get("typesfavEventType"),
-                "usuario":userCreated
-                }
+            ocialuserdata = {
+                "lastKnowLocLat": data.get("lastKnowLocLat"),
+                "lastKnowLocLong": data.get("lastKnowLocLong"),
+                "typesfavEventType": data.get("typesfavEventType"),
+                "usuario": userCreated,
+            }
             ocialuserform = OcialUserForm(ocialuserdata)
-            if ocialuserform.is_valid():     
+            if ocialuserform.is_valid():
                 ocialuserform.save()
                 return Response(status=status.HTTP_200_OK)
             else:
                 userCreated.delete()
                 return Response(
-                {"errors": ocialuserform.errors},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                    {"errors": ocialuserform.errors},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         else:
             return Response(
@@ -175,37 +180,46 @@ class RegisterClientView(APIView):
             )
 
         data = request.data
-        userdata ={"username":username,"password1":password,"password2":password,"email":email}
-        form = UserCreationForm(userdata) 
+        userdata = {
+            "username": username,
+            "password1": password,
+            "password2": password,
+            "email": email,
+        }
+        form = UserCreationForm(userdata)
         if form.is_valid():
             userCreated = form.save()
-            ocialclientdata = {"name":data.get("name"),
-                "identification_document":data.get("identification_document"),
-                "typeClient":data.get("typeClient"),
-                "default_latitude":data.get("default_latitude"),
-                "default_longitude":data.get("default_longitude"),
-                "usuario":userCreated
-                }
+            ocialclientdata = {
+                "name": data.get("name"),
+                "identification_document": data.get("identification_document"),
+                "typeClient": data.get("typeClient"),
+                "default_latitude": data.get("default_latitude"),
+                "default_longitude": data.get("default_longitude"),
+                "usuario": userCreated,
+            }
             ocialclientform = OcialClientForm(ocialclientdata)
-            if ocialclientform.is_valid():     
-                samenif = OcialClient.objects.filter(identification_document=data.get("identification_document"))     
+            if ocialclientform.is_valid():
+                samenif = OcialClient.objects.filter(
+                    identification_document=data.get("identification_document")
+                )
                 if samenif:
                     return Response(
-                    {"errors": "Este documento de identificación ya se encuentra registrado"},
-                    status=status.HTTP_400_BAD_REQUEST
+                        {
+                            "errors": "Este documento de identificación ya se encuentra registrado"
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
                     )
                 ocialclientform.save()
                 return Response(status=status.HTTP_200_OK)
             else:
                 userCreated.delete()
                 return Response(
-                {"errors": ocialclientform.errors},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                    {"errors": ocialclientform.errors},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         else:
             return Response(
                 {"errors": form.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
- 
