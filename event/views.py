@@ -80,9 +80,18 @@ class EventCreate(generics.CreateAPIView):
         request.data["ocialClient"] = ocialClient.id
         data = request.data
 
-        eventdata = {"name":data.get("name"),"place":data.get("place"),"event":data.get("event"),"date":data.get("date"),
-                     "hour":data.get("hour"),"capacity":data.get("capacity"),"category":data.get("category"),
-                     "latitude":data.get("latitude"),"longitude":data.get("longitude"),"ocialClient":data.get("ocialClient")}
+        eventdata = {
+            "name": data.get("name"),
+            "place": data.get("place"),
+            "event": data.get("event"),
+            "date": data.get("date"),
+            "hour": data.get("hour"),
+            "capacity": data.get("capacity"),
+            "category": data.get("category"),
+            "latitude": data.get("latitude"),
+            "longitude": data.get("longitude"),
+            "ocialClient": data.get("ocialClient"),
+        }
         eventform = OcialEventForm(eventdata)
         if eventform.is_valid():
             eventform.save()
@@ -91,7 +100,7 @@ class EventCreate(generics.CreateAPIView):
             return Response(
                 {"errors": eventform.errors},
                 status=status.HTTP_400_BAD_REQUEST,
-                )
+            )
 
 
 class EventDelete(generics.DestroyAPIView):
@@ -147,18 +156,28 @@ class EventUpdate(generics.UpdateAPIView):
         eventAct = Event.objects.filter(id=kwargs["pk"])
         if not (ocialClient[0].id == eventAct[0].ocialClient.id):
             return Response(
-                {"error": "No puedes actualizar datos de un evento de otro cliente"}, status=status.HTTP_403_FORBIDDEN
+                {"error": "No puedes actualizar datos de un evento de otro cliente"},
+                status=status.HTTP_403_FORBIDDEN,
             )
         ocialClient = ocialClient[0]
         request.data["ocialClient"] = ocialClient.id
         data = request.data
 
-        eventdata = {"name":data.get("name"),"place":data.get("place"),"event":data.get("event"),"date":data.get("date"),
-                     "hour":data.get("hour"),"capacity":data.get("capacity"),"category":data.get("category"),
-                     "latitude":data.get("latitude"),"longitude":data.get("longitude"),"ocialClient":data.get("ocialClient")}
+        eventdata = {
+            "name": data.get("name"),
+            "place": data.get("place"),
+            "event": data.get("event"),
+            "date": data.get("date"),
+            "hour": data.get("hour"),
+            "capacity": data.get("capacity"),
+            "category": data.get("category"),
+            "latitude": data.get("latitude"),
+            "longitude": data.get("longitude"),
+            "ocialClient": data.get("ocialClient"),
+        }
         eventform = OcialEventForm(eventdata)
         if eventform.is_valid():
-            eventUpdate = Event.objects.filter(id=kwargs["pk"])[0]    
+            eventUpdate = Event.objects.filter(id=kwargs["pk"])[0]
             eventUpdate.name = data.get("name")
             eventUpdate.place = data.get("place")
             eventUpdate.event = data.get("event")
