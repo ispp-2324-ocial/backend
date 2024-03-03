@@ -49,10 +49,12 @@ class OcialClient(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
+
 class OcialClientForm(ModelForm):
     class Meta:
         model = OcialClient
         fields = "__all__"
+
 
 class OcialUserForm(ModelForm):
     class Meta:
