@@ -71,6 +71,7 @@ class Rating(models.Model):
             self.comment
             self.event
 
+
 class OcialEventForm(ModelForm):
     class Meta:
         model = Event
