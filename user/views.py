@@ -86,7 +86,7 @@ class LoginUserView(APIView):
             200: OpenApiResponse(
                 response=inline_serializer(
                     name="TokenResponse",
-                    fields={"token": serializers.StringRelatedField()},
+                    fields={"token": serializers.StringRelatedField(), "user": "user", "isClient": serializers.BooleanField(), "clientData": "client"},
                 ),
                 description="Token de autenticación",
             ),
@@ -106,11 +106,21 @@ class LoginUserView(APIView):
         if serializer:
             if user is not None:
                 token, _ = Token.objects.get_or_create(user=user)
-
+                client = OcialClient.objects.filter(
+                    usuario=user
+                )
+                if client:
+                    isClient = True
+                    client = client[0]
+                else:
+                    isClient = False
+                    client = None
                 # Inicia sesión al usuario autenticado
                 login(request, user)
-
-                return Response({"token": token.key}, status=status.HTTP_200_OK)
+                userdata = DjangoUserSerializer(user).data
+                userdata.pop("password")
+                clientdata = ClientSerializer(client).data
+                return Response({"token": token.key, "user": userdata, "isClient": isClient, "clientData": clientdata }, status=status.HTTP_200_OK)
             else:
                 # La contraseña es incorrecta o no existe el usuario
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
