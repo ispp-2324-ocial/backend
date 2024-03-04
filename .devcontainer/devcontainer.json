@@ -24,7 +24,7 @@
     }
   },
   "postCreateCommand": {
-    "pip": "pip install -r backend/requirements.txt",
+    "pip": "pip install -r requirements.txt",
     "use-bash": "rm -rf /bin/sh && ln -s /bin/bash /bin/sh",
     "git-editor": "git config --global core.editor 'code --wait'",
     "git-template": "git config commit.template .gitmessage"
