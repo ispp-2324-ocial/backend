@@ -1,0 +1,59 @@
+name: OpenAPI 🔀
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - develop
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    env:
+      DEBUG: True
+      KEY: ${{ secrets.SECRET_KEY }}
+      DB_NAME: ocialdb
+      DB_USERNAME: ocialuser
+      DB_PASSWORD: ocialpass123
+      DB_HOST: localhost
+      DB_PORT: 5432
+
+    steps:
+      - name: Checkout ⬇️
+        uses: actions/checkout@v4.1.1
+        with:
+          show-progress: false
+          fetch-depth: 0
+
+      - name: Setup Python 🐍
+        uses: actions/setup-python@v5.0.0
+        with:
+          python-version: '3.x'
+          check-latest: true
+
+      - name: Install dependencies 📦
+        run: pip install -r requirements.txt
+
+      - name: Build schema 🏗️
+        run: python ./manage.py spectacular --file openapi.yaml --validate --fail-on-warn
+
+      - name: Check if the schema was modified
+        id: diff
+        run: echo "::set-output name=count::$(git status -su | grep openapi.yaml | wc -l)"
+
+      # "echo" in commit returns true so the build succeeds, even if no changed files
+      - name: Commit new changes to the repo
+        if: ${{ steps.diff.outputs.count > 0 && github.event_name != 'pull_request' }}
+        run: |
+          git config user.name GitHub Actions
+          git config user.email action@github.com
+          git pull
+          git add .
+          git commit -m "ci: update OpenAPI schema" || echo
+          git push
