@@ -2,35 +2,23 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from user.models import OcialClient
 from django.forms import ModelForm
+from ocial.models import *
 
 
 # Create your models here.
 class Event(models.Model):
-    class Category(models.TextChoices):
-        SPORTS = 0, ("Sports")
-        MUSIC = 1, ("Music")
-        MARKETS = 2, ("Markets")
-        RELAX_ACTIVITIES = 3, ("Relax activities")
-        LIVE_CONCERT = 4, ("Live concert")
-
     name = models.TextField()
     place = models.TextField()
     event = models.TextField()
     date = models.DateField()
     hour = models.TimeField()
     capacity = models.PositiveIntegerField(default=0)
-    category = models.TextField(choices=Category.choices, default=Category.SPORTS)
+    category = models.TextField(choices=[(category.value, category.name) for category in Category], default=Category.SPORTS.value)
     latitude = models.FloatField()
     longitude = models.FloatField()
     ocialClient = models.ForeignKey(
         OcialClient, related_name="OcialClient", on_delete=models.CASCADE
     )
-
-    # def get_event_by_client(self):
-    # obj = Event.objects.get(pk=self.object.id)
-    # return obj
-
-    # def get_event_with_latitud():
 
     def __str__(self):
         return "{}: {} | {}, {}".format(self.name, self.event, self.date, self.hour)
