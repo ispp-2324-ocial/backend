@@ -2,21 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from localflavor.es.models import ESIdentityCardNumberField
 from django.forms import ModelForm
+from ocial.models import *
 
 class OcialUser(models.Model):
-    class TypesfavEvent(models.TextChoices):
-        SPORTS = 0, ("Sports")
-        MUSIC = 1, ("Music")
-        MARKETS = 2, ("Markets")
-        RELAX_ACTIVITIES = 3, ("Relax activities")
-        LIVE_CONCERTS = 4, ("Live concerts")
-
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     lastKnowLocLat = models.FloatField()
     lastKnowLocLong = models.FloatField()
-    typesfavEventType = models.TextField(
-        choices=TypesfavEvent.choices, default=TypesfavEvent.SPORTS
-    )
+    category = models.TextField(choices=[(category.value, category.name) for category in Category], default=Category.SPORTS.value)
 
     def __str__(self):
         return self.usuario.username
