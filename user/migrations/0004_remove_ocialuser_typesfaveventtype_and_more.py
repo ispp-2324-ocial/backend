@@ -6,17 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0003_alter_ocialuser_typesfaveventtype'),
+        ("user", "0003_alter_ocialuser_typesfaveventtype"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='ocialuser',
-            name='typesfavEventType',
+            model_name="ocialuser",
+            name="typesfavEventType",
         ),
         migrations.AddField(
-            model_name='ocialuser',
-            name='category',
-            field=models.TextField(choices=[(0, 'SPORTS'), (1, 'MUSIC'), (2, 'MARKETS'), (3, 'RELAX_ACTIVITIES'), (4, 'LIVE_CONCERT')], default=0),
+            model_name="ocialuser",
+            name="category",
+            field=models.TextField(
+                choices=[
+                    (0, "SPORTS"),
+                    (1, "MUSIC"),
+                    (2, "MARKETS"),
+                    (3, "RELAX_ACTIVITIES"),
+                    (4, "LIVE_CONCERT"),
+                ],
+                default=0,
+            ),
         ),
     ]
