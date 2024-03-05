@@ -13,7 +13,10 @@ class Event(models.Model):
     date = models.DateField()
     hour = models.TimeField()
     capacity = models.PositiveIntegerField(default=0)
-    category = models.TextField(choices=[(category.value, category.name) for category in Category], default=Category.SPORTS.value)
+    category = models.TextField(
+        choices=[(category.value, category.name) for category in Category],
+        default=Category.SPORTS.value,
+    )
     latitude = models.FloatField()
     longitude = models.FloatField()
     ocialClient = models.ForeignKey(

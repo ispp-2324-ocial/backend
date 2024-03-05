@@ -8,7 +8,10 @@ class OcialUser(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     lastKnowLocLat = models.FloatField()
     lastKnowLocLong = models.FloatField()
-    category = models.TextField(choices=[(category.value, category.name) for category in Category], default=Category.SPORTS.value)
+    category = models.TextField(
+        choices=[(category.value, category.name) for category in Category],
+        default=Category.SPORTS.value,
+    )
 
     def __str__(self):
         return self.usuario.username
