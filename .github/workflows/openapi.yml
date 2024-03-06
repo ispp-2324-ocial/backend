@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - main
+      - develop
   pull_request:
     branches:
       - main
@@ -45,7 +46,7 @@ jobs:
 
       - name: Check if the schema was modified
         id: diff
-        run: echo "::set-output name=count::$(git status -su | grep openapi.yaml | wc -l)"
+        run: echo "count=$(git status -su | grep openapi.yaml | wc -l)" >> $GITHUB_OUTPUT
 
       # "echo" in commit returns true so the build succeeds, even if no changed files
       - name: Commit new changes to the repo
@@ -53,6 +54,8 @@ jobs:
         run: |
           git config user.name GitHub Actions
           git config user.email action@github.com
+          git config pull.rebase true
+          git config rebase.autoStash true
           git pull
           git add .
           git commit -m "ci: update OpenAPI schema" || echo
