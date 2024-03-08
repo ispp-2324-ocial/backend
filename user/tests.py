@@ -23,36 +23,36 @@ class OcialUserTestCase(TestCase):
         )
 
         self.user1 = OcialUser.objects.create(
-            usuario=self.user_1,
+            djangoUser=self.user_1,
             lastKnowLocLat=40.0,
             lastKnowLocLong=45.0,
         )
 
         self.user2 = OcialClient.objects.create(
-            usuario=self.user_2,
+            djangoUser=self.user_2,
             name="asjodbgfaodvhier",
-            identification_document="A12345678",  # cif
+            identificationDocument="A12345678",  # cif
             typeClient=OcialClient.TypeClient.ARTIST,
-            default_latitude=40.7128,
-            default_longitude=-40.7128,
+            defaultLatitude=40.7128,
+            defaultLongitude=-40.7128,
         )
 
         self.user3 = OcialClient.objects.create(
-            usuario=self.user_3,
+            djangoUser=self.user_3,
             name="A",
-            identification_document="X1234567A",  # nie
+            identificationDocument="X1234567A",  # nie
             typeClient=OcialClient.TypeClient.BAR_RESTAURANT,
-            default_latitude=40.7128,
-            default_longitude=0.0,
+            defaultLatitude=40.7128,
+            defaultLongitude=0.0,
         )
 
         self.user4 = OcialClient.objects.create(
-            usuario=self.user_4,
+            djangoUser=self.user_4,
             name="A",
-            identification_document="12345678A",  # dni
+            identificationDocument="12345678A",  # dni
             # Default typeClient
-            default_latitude=-40.7128,
-            default_longitude=0.0,
+            defaultLatitude=-40.7128,
+            defaultLongitude=0.0,
         )
 
         self.list1 = [self.user1, self.user2, self.user3, self.user4]

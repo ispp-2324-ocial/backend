@@ -17,9 +17,10 @@ class OcialClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OcialClient
-        fields = "__all__"
+        fields = ["name", "defaultLatitude", "defaultLongitude"]
 
 class EventSerializer(serializers.ModelSerializer):
+    ocialClient = OcialClientSerializer()
 
     class Meta:
         model = Event
