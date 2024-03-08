@@ -2,6 +2,7 @@ from rest_framework import generics, status, permissions
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.openapi import OpenApiResponse
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from .serializers import *
 from django.db.models.functions import ACos, Cos, Radians, Sin
 from django.db.models import F
@@ -12,6 +13,20 @@ from .models import OcialEventForm
 # Create your views here.
 from .models import Event, Rating, OcialClient
 
+class EventClientGet(APIView):
+    @extend_schema(
+        description="Get client instance by event id",
+        responses={
+            200: OpenApiResponse(response=OcialClientSerializer(many=True)),
+            400: OpenApiResponse(response=None, description="Error in request"),
+        },
+    )
+
+    def get(self, request, *args, **kwargs):
+        event = Event.objects.get(pk=kwargs["pk"])
+        print(event)
+        oc = OcialClient.objects.get(pk=event.ocialClient.pk)
+        return Response(OcialClientSerializer(oc).data, status=status.HTTP_200_OK)
 
 class EventList(generics.ListAPIView):
     queryset = Event.objects.all()
@@ -83,7 +98,7 @@ class EventCreate(generics.CreateAPIView):
         eventdata = {
             "name": data.get("name"),
             "place": data.get("place"),
-            "event": data.get("event"),
+            "description": data.get("description"),
             "date": data.get("date"),
             "hour": data.get("hour"),
             "capacity": data.get("capacity"),
@@ -133,7 +148,7 @@ class EventDelete(generics.DestroyAPIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class EventUpdate(generics.UpdateAPIView):
+class EventUpdate(APIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = EventSerializer
 
@@ -166,7 +181,7 @@ class EventUpdate(generics.UpdateAPIView):
         eventdata = {
             "name": data.get("name"),
             "place": data.get("place"),
-            "event": data.get("event"),
+            "description": data.get("description"),
             "date": data.get("date"),
             "hour": data.get("hour"),
             "capacity": data.get("capacity"),
@@ -180,7 +195,7 @@ class EventUpdate(generics.UpdateAPIView):
             eventUpdate = Event.objects.filter(id=kwargs["pk"])[0]
             eventUpdate.name = data.get("name")
             eventUpdate.place = data.get("place")
-            eventUpdate.event = data.get("event")
+            eventUpdate.description = data.get("description")
             eventUpdate.date = data.get("date")
             eventUpdate.hour = data.get("hour")
             eventUpdate.capacity = data.get("capacity")
@@ -256,8 +271,6 @@ class RatingUpdate(generics.UpdateAPIView):
     def put(self, request, *args, **kwargs):
         return super().put(request, *args, **kwargs)
 
-
-from drf_spectacular.utils import OpenApiParameter
 
 
 class EventNearby(generics.ListAPIView):
