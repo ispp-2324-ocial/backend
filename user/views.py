@@ -18,6 +18,7 @@ from django.core.files.base import ContentFile
 import blurhash
 from PIL import Image
 from images.models import Image as ImageModel
+from subscription.models import Subscription
 
 
 class RegisterUserView(APIView):
@@ -206,10 +207,26 @@ class RegisterClientView(APIView):
         username = request.data.get("username")
         password = request.data.get("password")
         email = request.data.get("email")
+        subscription_id = request.data.get("subscription")
 
         if User.objects.filter(username=username).exists():
             return Response(
                 {"error": "El nombre de usuario ya existe"},
+                status=status.HTTP_409_CONFLICT,
+            )
+        
+        #Posible solucion
+        """
+        request.data.pop("subscription")
+        subscription = Subscription.objects.filter(TypeSubscription=0)
+        print(subscription)
+        subscriptionClient = subscription[0]
+        request.data["subscription"] = subscription.id
+        """
+
+        if User.objects.filter(email=email).exists():
+            return Response(
+                {"error": "El correo ya está registrado"},
                 status=status.HTTP_409_CONFLICT,
             )
 
