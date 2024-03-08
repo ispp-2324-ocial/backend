@@ -9,7 +9,7 @@ from ocial.models import *
 class Event(models.Model):
     name = models.TextField()
     place = models.TextField()
-    event = models.TextField()
+    description = models.TextField()
     date = models.DateField()
     hour = models.TimeField()
     capacity = models.PositiveIntegerField(default=0)
@@ -24,7 +24,7 @@ class Event(models.Model):
     )
 
     def __str__(self):
-        return "{}: {} | {}, {}".format(self.name, self.event, self.date, self.hour)
+        return "{}: {} | {}, {}".format(self.name, self.description, self.date, self.hour)
 
     def save(self, *args, **kwargs):
         is_new = not self.pk
@@ -33,7 +33,7 @@ class Event(models.Model):
         if is_new:
             self.name
             self.place
-            self.event
+            self.description
             self.date
             self.hour
             self.capacity
