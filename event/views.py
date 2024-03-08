@@ -60,7 +60,7 @@ class EventListByClient(generics.ListAPIView):
             )
 
         # Get list of events if client has events, otherwise []
-        ocialClient = OcialClient.objects.filter(usuario=kwargs["pk"])
+        ocialClient = OcialClient.objects.filter(pk=kwargs["pk"])
         if ocialClient:
             events = Event.objects.filter(ocialClient=ocialClient[0].id)
             serialized_events = [EventSerializer(event).data for event in events]
@@ -86,7 +86,7 @@ class EventCreate(generics.CreateAPIView):
             )
 
         request.data.pop("ocialClient")
-        ocialClient = OcialClient.objects.filter(usuario=request.user)
+        ocialClient = OcialClient.objects.filter(djangoUser=request.user)
         if not ocialClient:
             return Response(
                 {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
@@ -134,7 +134,7 @@ class EventDelete(generics.DestroyAPIView):
                 {"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        ocialClient = OcialClient.objects.filter(usuario=request.user)
+        ocialClient = OcialClient.objects.filter(djangoUser=request.user)
         eventAct = Event.objects.filter(id=kwargs["pk"])
         if not (ocialClient[0].id == eventAct[0].ocialClient.id):
             return Response(
@@ -167,7 +167,7 @@ class EventUpdate(APIView):
             )
 
         request.data.pop("ocialClient")
-        ocialClient = OcialClient.objects.filter(usuario=request.user)
+        ocialClient = OcialClient.objects.filter(djangoUser=request.user)
         eventAct = Event.objects.filter(id=kwargs["pk"])
         if not (ocialClient[0].id == eventAct[0].ocialClient.id):
             return Response(

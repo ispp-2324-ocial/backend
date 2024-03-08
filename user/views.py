@@ -52,8 +52,8 @@ class RegisterUserView(APIView):
             ocialuserdata = {
                 "lastKnowLocLat": data.get("lastKnowLocLat"),
                 "lastKnowLocLong": data.get("lastKnowLocLong"),
-                "typesfavEventType": data.get("typesfavEventType"),
-                "usuario": userCreated,
+                "typesFavEventType": data.get("typesFavEventType"),
+                "djangoUser": userCreated,
             }
             ocialuserform = OcialUserForm(ocialuserdata)
             if ocialuserform.is_valid():
@@ -111,7 +111,7 @@ class LoginUserView(APIView):
         if serializer:
             if user is not None:
                 token, _ = Token.objects.get_or_create(user=user)
-                client = OcialClient.objects.filter(usuario=user)
+                client = OcialClient.objects.filter(djangoUser=user)
                 if client:
                     isClient = True
                     client = client[0]
@@ -210,20 +210,20 @@ class RegisterClientView(APIView):
         form = UserCreationForm(userdata)
         if form.is_valid():
             userCreated = form.save()
-            dni = data.get("identification_document")
+            dni = data.get("identificationDocument")
             dni = dni[:-1] + dni[-1].upper()
             ocialclientdata = {
                 "name": data.get("name"),
-                "identification_document": dni,
+                "identificationDocument": dni,
                 "typeClient": data.get("typeClient"),
-                "default_latitude": data.get("default_latitude"),
-                "default_longitude": data.get("default_longitude"),
-                "usuario": userCreated,
+                "defaultLatitude": data.get("defaultLatitude"),
+                "defaultLongitude": data.get("defaultLongitude"),
+                "djangoUser": userCreated,
             }
             ocialclientform = OcialClientForm(ocialclientdata)
             if ocialclientform.is_valid():
                 samenif = OcialClient.objects.filter(
-                    identification_document=data.get("identification_document")
+                    identificationDocument=data.get("identificationDocument")
                 )
                 if samenif:
                     return Response(
