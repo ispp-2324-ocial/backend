@@ -232,7 +232,7 @@ class RegisterClientView(APIView):
             userCreated = form.save()
             ocialclientdata = {
                 "name": data.get("name"),
-                "identificationDocument": data.get("identificationDocument"),
+                "identification_document": dni,
                 "typeClient": data.get("typeClient"),
                 "defaultLatitude": data.get("defaultLatitude"),
                 "defaultLongitude": data.get("defaultLongitude"),
