@@ -15,12 +15,12 @@ class EventListTestCase(TestCase):
             "ocialuser3", "chevy@chase.com", "chevyspassword"
         )
         self.client1 = OcialClient.objects.create(
-            usuario=self.user_3,
+            djangoUser=self.user_3,
             name="A",
-            identification_document="X1234567A",  # nie
+            identificationDocument="X1234567A",  # nie
             typeClient=OcialClient.TypeClient.BAR_RESTAURANT,
-            default_latitude=40.7128,
-            default_longitude=0.0,
+            defaultLatitude=40.7128,
+            defaultLongitude=0.0,
         )
         self.event1 = Event.objects.create(
             name="Football Match",

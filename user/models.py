@@ -6,7 +6,7 @@ from ocial.models import *
 
 
 class OcialUser(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    djangoUser = models.OneToOneField(User, on_delete=models.CASCADE)
     lastKnowLocLat = models.FloatField()
     lastKnowLocLong = models.FloatField()
     category = models.TextField(
@@ -15,16 +15,16 @@ class OcialUser(models.Model):
     )
 
     def __str__(self):
-        return self.usuario.username
+        return self.djangoUser.username
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
 
 class OcialClient(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    djangoUser = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.TextField()
-    identification_document = models.CharField(max_length=9, unique=True, help_text="8 números seguidos de una letra del abecedario español", 
+    identificationDocument = models.CharField(max_length=9, unique=True, help_text="8 números seguidos de una letra del abecedario español", 
         validators=[RegexValidator(
             regex=r'^\d{8}(?![IOUÑiouñ])[A-HJ-NP-Za-hj-np-z]$',  # Expresión regular para 8 números seguidos de una letra del abecedario español
             message="El documento de identificación debe contener 8 números seguidos de una letra del abecedario español exceptuando i,o,u o ñ",
@@ -35,8 +35,8 @@ class OcialClient(models.Model):
         choices=[(typeclient.value, typeclient.name) for typeclient in TypeClient],
         default=TypeClient.SMALL_BUSINESS.value,
     )
-    default_latitude = models.FloatField()
-    default_longitude = models.FloatField()
+    defaultLatitude = models.FloatField()
+    defaultLongitude = models.FloatField()
 
     def __str__(self):
         return self.name
