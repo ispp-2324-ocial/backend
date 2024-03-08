@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from localflavor.es.models import ESIdentityCardNumberField
 from django.forms import ModelForm
+from subscription.models import Subscription
 
 
 class OcialUser(models.Model):
@@ -42,6 +43,7 @@ class OcialClient(models.Model):
     )
     default_latitude = models.FloatField()
     default_longitude = models.FloatField()
+    #subscription = models.ForeignKey(Subscription, related_name="Subscription", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

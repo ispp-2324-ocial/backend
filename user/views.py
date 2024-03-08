@@ -11,6 +11,7 @@ from django.contrib.auth.forms import UserCreationForm
 from .serializers import *
 from .models import OcialClientForm
 from .models import OcialUserForm
+from subscription.models import Subscription
 
 
 class RegisterUserView(APIView):
@@ -193,12 +194,22 @@ class RegisterClientView(APIView):
         username = request.data.get("username")
         password = request.data.get("password")
         email = request.data.get("email")
+        subscription_id = request.data.get("subscription")
 
         if User.objects.filter(username=username).exists():
             return Response(
                 {"error": "El nombre de usuario ya existe"},
                 status=status.HTTP_409_CONFLICT,
             )
+        
+        #Posible solucion
+        """
+        request.data.pop("subscription")
+        subscription = Subscription.objects.filter(TypeSubscription=0)
+        print(subscription)
+        subscriptionClient = subscription[0]
+        request.data["subscription"] = subscription.id
+        """
 
         data = request.data
         userdata = {
@@ -216,6 +227,8 @@ class RegisterClientView(APIView):
                 "typeClient": data.get("typeClient"),
                 "default_latitude": data.get("default_latitude"),
                 "default_longitude": data.get("default_longitude"),
+                #"subscription": subscriptionClient,
+                "subscription": data.get("subscription"),
                 "usuario": userCreated,
             }
             ocialclientform = OcialClientForm(ocialclientdata)

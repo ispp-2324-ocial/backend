@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "localflavor",
     "user",
     "chat",
+    "subscription",
     "drf_spectacular",
     "rest_framework.authtoken",
 ]
