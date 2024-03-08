@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from localflavor.es.models import ESIdentityCardNumberField
+from django.core.validators import RegexValidator
 from django.forms import ModelForm
 from ocial.models import *
 
@@ -24,7 +24,13 @@ class OcialUser(models.Model):
 class OcialClient(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.TextField()
-    identification_document = ESIdentityCardNumberField()
+    identification_document = models.CharField(max_length=9, unique=True, help_text="8 números seguidos de una letra del abecedario español", 
+        validators=[RegexValidator(
+            regex=r'^\d{8}(?![IOUÑiouñ])[A-HJ-NP-Za-hj-np-z]$',  # Expresión regular para 8 números seguidos de una letra del abecedario español
+            message="El documento de identificación debe contener 8 números seguidos de una letra del abecedario español exceptuando i,o,u o ñ",
+            code="invalid_identification_document"
+        )]
+    )
     typeClient = models.TextField(
         choices=[(typeclient.value, typeclient.name) for typeclient in TypeClient],
         default=TypeClient.SMALL_BUSINESS.value,

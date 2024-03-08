@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event, Rating
+from .models import Event, Rating, OcialClient
 
 
 class RatingSerializer(serializers.ModelSerializer):
@@ -13,13 +13,11 @@ class RatingCreateSerializer(serializers.ModelSerializer):
         model = Rating
         fields = "__all__"
 
-
-class EventUpdateSerializer(serializers.ModelSerializer):
+class OcialClientSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Event
+        model = OcialClient
         fields = "__all__"
-
 
 class EventSerializer(serializers.ModelSerializer):
 
