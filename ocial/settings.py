@@ -43,6 +43,7 @@ REST_FRAMEWORK = {
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "event",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     "localflavor",
     "user",
     "chat",
+    "notification",
     "drf_spectacular",
     "rest_framework.authtoken",
 ]
@@ -104,8 +106,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "ocial.wsgi.application"
-
+# WSGI_APPLICATION = 'ocial.wsgi.application'
+# Channels
+ASGI_APPLICATION = "ocial.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
