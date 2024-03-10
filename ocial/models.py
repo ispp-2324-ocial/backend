@@ -15,3 +15,8 @@ class TypeClient(Enum):
     BAR_RESTAURANT = "Bar Restaurant"
     LOCAL_GUIDE = "Local Guide"
     EVENTS_AND_CONCERTS = "Events And Concerts"
+
+
+class AuthProvider(Enum):
+    EMAIL = "email"
+    GOOGLE = "google"
