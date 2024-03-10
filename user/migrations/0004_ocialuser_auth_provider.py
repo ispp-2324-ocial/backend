@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0003_alter_ocialuser_typesfaveventtype'),
+        ("user", "0003_alter_ocialuser_typesfaveventtype"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='ocialuser',
-            name='auth_provider',
-            field=models.TextField(choices=[('email', 'EMAIL'), ('google', 'GOOGLE')], default='email'),
+            model_name="ocialuser",
+            name="auth_provider",
+            field=models.TextField(
+                choices=[("email", "EMAIL"), ("google", "GOOGLE")], default="email"
+            ),
         ),
     ]
