@@ -310,21 +310,20 @@ class GoogleSocialAuthView(APIView):
             ),
         },
     )
-
     def post(self, request):
         serializer = GoogleSocialAuthSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user_data = ((serializer.validated_data)['auth_token'])
+        user_data = (serializer.validated_data)["auth_token"]
         if user_data:
             try:
-                user_data['sub']
+                user_data["sub"]
             except KeyError:
                 return Response(
                     {"error": "Token is not valid."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            if user_data['aud'] != settings.GOOGLE_OAUTH2_CLIENT_ID:
+            if user_data["aud"] != settings.GOOGLE_OAUTH2_CLIENT_ID:
                 return Response(
                     {"error": "Token is not valid for this app."},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -338,12 +337,16 @@ class GoogleSocialAuthView(APIView):
                     ocialuser = ocialuser[0]
                     if ocialuser.auth_provider != "google":
                         return Response(
-                            {"error": "User already exists. Try logging in with your email."},
+                            {
+                                "error": "User already exists. Try logging in with your email."
+                            },
                             status=status.HTTP_400_BAD_REQUEST,
                         )
                     else:
                         authenticated_user = authenticate(
-                            request, username=user.username, password=settings.GOOGLE_OAUTH2_CLIENT_SECRET
+                            request,
+                            username=user.username,
+                            password=settings.GOOGLE_OAUTH2_CLIENT_SECRET,
                         )
                         token, _ = Token.objects.get_or_create(user=authenticated_user)
                         userdata = DjangoUserSerializer(authenticated_user).data
@@ -360,7 +363,8 @@ class GoogleSocialAuthView(APIView):
             else:
                 user = User.objects.create_user(
                     email=email,
-                    username=user_data.get("email").split("@")[0] + str(random.randint(0,1000)),
+                    username=user_data.get("email").split("@")[0]
+                    + str(random.randint(0, 1000)),
                     first_name=user_data.get("given_name"),
                     last_name=user_data.get("family_name"),
                     password=settings.GOOGLE_OAUTH2_CLIENT_SECRET,
@@ -375,7 +379,9 @@ class GoogleSocialAuthView(APIView):
                 if ocialuserform.is_valid():
                     ocialuserform.save()
                     authenticated_user = authenticate(
-                        request, username=user.username, password=settings.GOOGLE_OAUTH2_CLIENT_SECRET
+                        request,
+                        username=user.username,
+                        password=settings.GOOGLE_OAUTH2_CLIENT_SECRET,
                     )
                     token, _ = Token.objects.get_or_create(user=authenticated_user)
                     userdata = DjangoUserSerializer(authenticated_user).data
