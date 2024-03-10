@@ -15,9 +15,13 @@ class OcialUser(models.Model):
     )
 =======
 
+
 class OcialUser(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    auth_provider = models.TextField(choices=[(provider.value, provider.name) for provider in AuthProvider], default=AuthProvider.EMAIL.value)
+    auth_provider = models.TextField(
+        choices=[(provider.value, provider.name) for provider in AuthProvider],
+        default=AuthProvider.EMAIL.value,
+    )
     lastKnowLocLat = models.FloatField()
     lastKnowLocLong = models.FloatField()
 >>>>>>> 28afc54 (feat(users): google social auth)

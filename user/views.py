@@ -40,7 +40,7 @@ class RegisterUserView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-        data = request.data
+        request.data
         userdata = {
             "username": username,
             "password1": password,

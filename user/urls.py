@@ -10,5 +10,7 @@ urlpatterns = [
     path(
         "client/register/", views.RegisterClientView.as_view(), name="client_register"
     ),
-    path("user/google-oauth2/", views.GoogleSocialAuthView.as_view(), name="google_auth"),
+    path(
+        "user/google-oauth2/", views.GoogleSocialAuthView.as_view(), name="google_auth"
+    ),
 ]
