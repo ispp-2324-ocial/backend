@@ -297,10 +297,10 @@ class GoogleSocialAuthView(APIView):
                 response=inline_serializer(
                     name="GoogleSocialAuthResponse",
                     fields={
-                        "sub": serializers.StringRelatedField(),
-                        "name": serializers.StringRelatedField(),
-                        "email": serializers.StringRelatedField(),
-                        "picture": serializers.StringRelatedField(),
+                        "token": serializers.StringRelatedField(),
+                        "user": "user",
+                        "isClient": serializers.BooleanField(),
+                        "clientData": "client",
                     },
                 ),
                 description="Datos del usuario autenticado",
