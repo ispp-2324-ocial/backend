@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from localflavor.es.models import ESIdentityCardNumberField
 from django.forms import ModelForm
 from ocial.models import *
+<<<<<<< HEAD
 
 class OcialUser(models.Model):
     djangoUser = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -12,6 +13,14 @@ class OcialUser(models.Model):
         choices=[(category.value, category.name) for category in Category],
         default=Category.SPORTS.value,
     )
+=======
+
+class OcialUser(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    auth_provider = models.TextField(choices=[(provider.value, provider.name) for provider in AuthProvider], default=AuthProvider.EMAIL.value)
+    lastKnowLocLat = models.FloatField()
+    lastKnowLocLong = models.FloatField()
+>>>>>>> 28afc54 (feat(users): google social auth)
 
     def __str__(self):
         return self.djangoUser.username
