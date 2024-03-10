@@ -2,9 +2,8 @@ from rest_framework import serializers
 from user.models import OcialClient, OcialUser
 from django.contrib.auth.models import User
 from . import google
-from rest_framework.exceptions import AuthenticationFailed
 from django.conf import settings
-import random
+
 
 class DjangoUserSerializer(serializers.ModelSerializer):
     """
@@ -65,14 +64,12 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         user_data = google.Google.validate(auth_token)
         user_data = google.Google.validate(auth_token)
         try:
-            user_data['sub']
+            user_data["sub"]
         except KeyError:
             raise serializers.ValidationError(
-                'The token is invalid or expired. Please login again.'
+                "The token is invalid or expired. Please login again."
             )
 
-        if user_data['aud'] != settings.GOOGLE_OAUTH2_CLIENT_ID:
-            raise serializers.ValidationError(
-                'Token is not valid for this app.'
-            )
+        if user_data["aud"] != settings.GOOGLE_OAUTH2_CLIENT_ID:
+            raise serializers.ValidationError("Token is not valid for this app.")
         return user_data
