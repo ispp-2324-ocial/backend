@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.openapi import OpenApiResponse
 from .models import Chat, Message
@@ -35,7 +35,7 @@ class ChatDetail(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        messages = Message.objects.filter(chat=instance)
+        messages = Message.objects.filter(chatId=instance)
         sorted_messages = sorted(
             messages, key=lambda message: message.id
         )  # Ordenar por ID
@@ -60,7 +60,13 @@ class MessageCreate(generics.CreateAPIView):
         },
     )
     def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+        chat = Chat.objects.filter(id=kwargs["chat_id"])
+        if chat.exists():
+            message = Message.objects.create(content=request.data["content"], chatId=chat[0])
+            return Response(MessageSerializer(message).data, status=status.HTTP_200_OK)
+        return Response(
+                {"error": "No existe el chat indicado"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class MessageDelete(generics.DestroyAPIView):

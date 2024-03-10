@@ -24,7 +24,6 @@ class EventClientGet(APIView):
 
     def get(self, request, *args, **kwargs):
         event = Event.objects.get(pk=kwargs["pk"])
-        print(event)
         oc = OcialClient.objects.get(pk=event.ocialClient.pk)
         return Response(OcialClientSerializer(oc).data, status=status.HTTP_200_OK)
 
@@ -42,7 +41,6 @@ class EventList(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-
 class EventListByClient(generics.ListAPIView):
     serializer_class = EventSerializer
 
@@ -50,7 +48,7 @@ class EventListByClient(generics.ListAPIView):
         description="List of events by client id",
         responses={
             200: OpenApiResponse(response=EventSerializer(many=True)),
-            400: OpenApiResponse(response=None, description="Error in request"),
+            400: OpenApiResponse(response=None, description="No estás logueado"),
         },
     )
     def get(self, request, *args, **kwargs):
@@ -67,16 +65,16 @@ class EventListByClient(generics.ListAPIView):
             return Response(serialized_events, status=status.HTTP_200_OK)
         return Response([], status=status.HTTP_200_OK)
 
-
 class EventCreate(generics.CreateAPIView):
-    permission_classes = [permissions.AllowAny]
 
     @extend_schema(
         request=EventSerializer,
         description="Create a new event",
         responses={
-            201: OpenApiResponse(response=None),
-            400: OpenApiResponse(response=None, description="Error in request"),
+            201: OpenApiResponse(response=None, description="El evento se ha creado"),
+            400: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
+            403: OpenApiResponse(response=None, description="El usuario no es cliente"),
+            422: OpenApiResponse(response=None, description="El formulario contiene errores")
         },
     )
     def post(self, request, *args, **kwargs):
@@ -110,11 +108,11 @@ class EventCreate(generics.CreateAPIView):
         eventform = OcialEventForm(eventdata)
         if eventform.is_valid():
             eventform.save()
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(
                 {"errors": eventform.errors},
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
 
@@ -123,8 +121,10 @@ class EventDelete(generics.DestroyAPIView):
     @extend_schema(
         description="Delete an event",
         responses={
-            204: OpenApiResponse(description="Event deleted successfully"),
-            404: OpenApiResponse(response=None, description="Message not found"),
+            204: OpenApiResponse(response=None, description="El evento se ha eliminado"),
+            400: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
+            403: OpenApiResponse(response=None, description="El usuario no es cliente"),
+            404: OpenApiResponse(response=None, description="El evento no existe")
         },
     )
     def delete(self, request, *args, **kwargs):
@@ -145,19 +145,20 @@ class EventDelete(generics.DestroyAPIView):
             eventAct.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class EventUpdate(APIView):
-    permission_classes = [permissions.AllowAny]
     serializer_class = EventSerializer
 
     @extend_schema(
         request=EventSerializer,
         description="Update an event",
         responses={
-            201: OpenApiResponse(response=None),
-            400: OpenApiResponse(response=None, description="Error in request"),
+            200: OpenApiResponse(response=None, description="El evento se ha actualizado"),
+            400: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
+            403: OpenApiResponse(response=None, description="El evento no pertenece al usuario activo"),
+            422: OpenApiResponse(response=None, description="El formulario contiene errores")
         },
     )
     def put(self, request, *args, **kwargs):
@@ -204,7 +205,7 @@ class EventUpdate(APIView):
             eventUpdate.longitude = data.get("longitude")
             eventUpdate.save()
             return Response(status=status.HTTP_200_OK)
-        return Response(eventform.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(eventform.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 # TODO Rating Methods
