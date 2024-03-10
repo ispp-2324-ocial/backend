@@ -285,3 +285,114 @@ class RegisterClientView(APIView):
                 {"errors": form.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class GoogleSocialAuthView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(
+        request=GoogleSocialAuthSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=inline_serializer(
+                    name="GoogleSocialAuthResponse",
+                    fields={
+                        "sub": serializers.StringRelatedField(),
+                        "name": serializers.StringRelatedField(),
+                        "email": serializers.StringRelatedField(),
+                        "picture": serializers.StringRelatedField(),
+                    },
+                ),
+                description="Datos del usuario autenticado",
+            ),
+            400: OpenApiResponse(
+                response=None, description="Los datos de la petición son incorrectos"
+            ),
+        },
+    )
+
+    def post(self, request):
+        serializer = GoogleSocialAuthSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_data = ((serializer.validated_data)['auth_token'])
+        if user_data:
+            try:
+                user_data['sub']
+            except KeyError:
+                return Response(
+                    {"error": "Token is not valid."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if user_data['aud'] != settings.GOOGLE_OAUTH2_CLIENT_ID:
+                return Response(
+                    {"error": "Token is not valid for this app."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            email = user_data.get("email")
+            user = User.objects.filter(email=email)
+            if user:
+                user = user[0]
+                ocialuser = OcialUser.objects.filter(usuario=user)
+                if ocialuser:
+                    ocialuser = ocialuser[0]
+                    if ocialuser.auth_provider != "google":
+                        return Response(
+                            {"error": "User already exists. Try logging in with your email."},
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
+                    else:
+                        authenticated_user = authenticate(
+                            request, username=user.username, password=settings.GOOGLE_OAUTH2_CLIENT_SECRET
+                        )
+                        token, _ = Token.objects.get_or_create(user=authenticated_user)
+                        userdata = DjangoUserSerializer(authenticated_user).data
+                        userdata.pop("password")
+                        return Response(
+                            {
+                                "token": token.key,
+                                "user": userdata,
+                                "isClient": False,
+                                "clientData": None,
+                            },
+                            status=status.HTTP_200_OK,
+                        )
+            else:
+                user = User.objects.create_user(
+                    email=email,
+                    username=user_data.get("email").split("@")[0] + str(random.randint(0,1000)),
+                    first_name=user_data.get("given_name"),
+                    last_name=user_data.get("family_name"),
+                    password=settings.GOOGLE_OAUTH2_CLIENT_SECRET,
+                )
+                ocialuserdata = {
+                    "usuario": user,
+                    "lastKnowLocLat": 0,
+                    "lastKnowLocLong": 0,
+                    "auth_provider": "google",
+                }
+                ocialuserform = OcialUserForm(ocialuserdata)
+                if ocialuserform.is_valid():
+                    ocialuserform.save()
+                    authenticated_user = authenticate(
+                        request, username=user.username, password=settings.GOOGLE_OAUTH2_CLIENT_SECRET
+                    )
+                    token, _ = Token.objects.get_or_create(user=authenticated_user)
+                    userdata = DjangoUserSerializer(authenticated_user).data
+                    userdata.pop("password")
+                    return Response(
+                        {
+                            "token": token.key,
+                            "user": userdata,
+                            "isClient": False,
+                            "clientData": None,
+                        },
+                        status=status.HTTP_200_OK,
+                    )
+                else:
+                    user.delete()
+                    return Response(
+                        {"errors": ocialuserform.errors},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            return Response(user_data, status=status.HTTP_200_OK)

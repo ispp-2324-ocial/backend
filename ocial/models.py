@@ -80,3 +80,73 @@ class TypeClient(Enum):
     BAR_RESTAURANT = "Bar Restaurant"
     LOCAL_GUIDE = "Local Guide"
     EVENTS_AND_CONCERTS = "Events And Concerts"
+
+class TypeSubscription(Enum):
+        FREE = "Free"
+        BASIC = "Basic"
+        PRO = "Pro"
+
+
+class TypeClient(Enum):
+    SMALL_BUSINESS = "Small business"
+    ARTIST = "Artist"
+    BAR_RESTAURANT = "Bar Restaurant"
+    LOCAL_GUIDE = "Local Guide"
+    EVENTS_AND_CONCERTS = "Events And Concerts"
+
+class TypeSubscription(Enum):
+        FREE = "Free"
+        BASIC = "Basic"
+        PRO = "Pro"
+
+class TypeClient(Enum):
+    SMALL_BUSINESS = "Small business"
+    ARTIST = "Artist"
+    BAR_RESTAURANT = "Bar Restaurant"
+    LOCAL_GUIDE = "Local Guide"
+    EVENTS_AND_CONCERTS = "Events And Concerts"
+
+
+class TypeClient(Enum):
+    SMALL_BUSINESS = "Small business"
+    ARTIST = "Artist"
+    BAR_RESTAURANT = "Bar Restaurant"
+    LOCAL_GUIDE = "Local Guide"
+    EVENTS_AND_CONCERTS = "Events And Concerts"
+
+class TypeSubscription(Enum):
+        FREE = "Free"
+        BASIC = "Basic"
+        PRO = "Pro"
+
+
+class TypeClient(Enum):
+    SMALL_BUSINESS = "Small business"
+    ARTIST = "Artist"
+    BAR_RESTAURANT = "Bar Restaurant"
+    LOCAL_GUIDE = "Local Guide"
+    EVENTS_AND_CONCERTS = "Events And Concerts"
+
+class TypeSubscription(Enum):
+        FREE = "Free"
+        BASIC = "Basic"
+        PRO = "Pro"
+
+class TypeClient(Enum):
+    SMALL_BUSINESS = "Small business"
+    ARTIST = "Artist"
+    BAR_RESTAURANT = "Bar Restaurant"
+    LOCAL_GUIDE = "Local Guide"
+    EVENTS_AND_CONCERTS = "Events And Concerts"
+
+class TypeClient(Enum):
+    SMALL_BUSINESS = "Small business"
+    ARTIST = "Artist"
+    BAR_RESTAURANT = "Bar Restaurant"
+    LOCAL_GUIDE = "Local Guide"
+    EVENTS_AND_CONCERTS = "Events And Concerts"
+
+
+class AuthProvider(Enum):
+    EMAIL = "email"
+    GOOGLE = "google"
