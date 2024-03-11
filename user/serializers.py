@@ -28,7 +28,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OcialClient
-        exclude = ('djangoUser', )
+        exclude = ("djangoUser",)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -38,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OcialUser
-        exclude = ('djangoUser', )
+        exclude = ("djangoUser",)
 
 
 class LoginUserSerializer(serializers.ModelSerializer):

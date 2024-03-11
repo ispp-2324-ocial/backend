@@ -62,11 +62,13 @@ class MessageCreate(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         chat = Chat.objects.filter(id=kwargs["chat_id"])
         if chat.exists():
-            message = Message.objects.create(content=request.data["content"], chatId=chat[0])
+            message = Message.objects.create(
+                content=request.data["content"], chatId=chat[0]
+            )
             return Response(MessageSerializer(message).data, status=status.HTTP_200_OK)
         return Response(
-                {"error": "No existe el chat indicado"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            {"error": "No existe el chat indicado"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class MessageDelete(generics.DestroyAPIView):

@@ -1,4 +1,4 @@
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.openapi import OpenApiResponse
 from rest_framework.response import Response
@@ -13,6 +13,7 @@ from .models import OcialEventForm
 # Create your views here.
 from .models import Event, Rating, OcialClient
 
+
 class EventClientGet(APIView):
     @extend_schema(
         description="Get client instance by event id",
@@ -21,11 +22,11 @@ class EventClientGet(APIView):
             400: OpenApiResponse(response=None, description="Error in request"),
         },
     )
-
     def get(self, request, *args, **kwargs):
         event = Event.objects.get(pk=kwargs["pk"])
         oc = OcialClient.objects.get(pk=event.ocialClient.pk)
         return Response(OcialClientSerializer(oc).data, status=status.HTTP_200_OK)
+
 
 class EventList(generics.ListAPIView):
     queryset = Event.objects.all()
@@ -40,6 +41,7 @@ class EventList(generics.ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+
 
 class EventListByClient(generics.ListAPIView):
     serializer_class = EventSerializer
@@ -65,6 +67,7 @@ class EventListByClient(generics.ListAPIView):
             return Response(serialized_events, status=status.HTTP_200_OK)
         return Response([], status=status.HTTP_200_OK)
 
+
 class EventCreate(generics.CreateAPIView):
 
     @extend_schema(
@@ -72,9 +75,13 @@ class EventCreate(generics.CreateAPIView):
         description="Create a new event",
         responses={
             201: OpenApiResponse(response=None, description="El evento se ha creado"),
-            400: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
+            400: OpenApiResponse(
+                response=None, description="El usuario no ha iniciado sesión"
+            ),
             403: OpenApiResponse(response=None, description="El usuario no es cliente"),
-            422: OpenApiResponse(response=None, description="El formulario contiene errores")
+            422: OpenApiResponse(
+                response=None, description="El formulario contiene errores"
+            ),
         },
     )
     def post(self, request, *args, **kwargs):
@@ -121,10 +128,14 @@ class EventDelete(generics.DestroyAPIView):
     @extend_schema(
         description="Delete an event",
         responses={
-            204: OpenApiResponse(response=None, description="El evento se ha eliminado"),
-            400: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
+            204: OpenApiResponse(
+                response=None, description="El evento se ha eliminado"
+            ),
+            400: OpenApiResponse(
+                response=None, description="El usuario no ha iniciado sesión"
+            ),
             403: OpenApiResponse(response=None, description="El usuario no es cliente"),
-            404: OpenApiResponse(response=None, description="El evento no existe")
+            404: OpenApiResponse(response=None, description="El evento no existe"),
         },
     )
     def delete(self, request, *args, **kwargs):
@@ -155,10 +166,18 @@ class EventUpdate(APIView):
         request=EventSerializer,
         description="Update an event",
         responses={
-            200: OpenApiResponse(response=None, description="El evento se ha actualizado"),
-            400: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
-            403: OpenApiResponse(response=None, description="El evento no pertenece al usuario activo"),
-            422: OpenApiResponse(response=None, description="El formulario contiene errores")
+            200: OpenApiResponse(
+                response=None, description="El evento se ha actualizado"
+            ),
+            400: OpenApiResponse(
+                response=None, description="El usuario no ha iniciado sesión"
+            ),
+            403: OpenApiResponse(
+                response=None, description="El evento no pertenece al usuario activo"
+            ),
+            422: OpenApiResponse(
+                response=None, description="El formulario contiene errores"
+            ),
         },
     )
     def put(self, request, *args, **kwargs):
@@ -271,7 +290,6 @@ class RatingUpdate(generics.UpdateAPIView):
     )
     def put(self, request, *args, **kwargs):
         return super().put(request, *args, **kwargs)
-
 
 
 class EventNearby(generics.ListAPIView):
