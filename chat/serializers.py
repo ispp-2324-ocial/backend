@@ -19,4 +19,4 @@ class ChatSerializer(serializers.ModelSerializer):
 class MessageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        exclude = ("chatId", )
+        exclude = ("chatId",)

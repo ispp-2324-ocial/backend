@@ -6,28 +6,28 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0005_rename_usuario_ocialclient_djangouser_and_more'),
+        ("user", "0005_rename_usuario_ocialclient_djangouser_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='ocialclient',
-            old_name='default_latitude',
-            new_name='defaultLatitude',
+            model_name="ocialclient",
+            old_name="default_latitude",
+            new_name="defaultLatitude",
         ),
         migrations.RenameField(
-            model_name='ocialclient',
-            old_name='default_longitude',
-            new_name='defaultLongitude',
+            model_name="ocialclient",
+            old_name="default_longitude",
+            new_name="defaultLongitude",
         ),
         migrations.RenameField(
-            model_name='ocialclient',
-            old_name='identification_document',
-            new_name='identificationDocument',
+            model_name="ocialclient",
+            old_name="identification_document",
+            new_name="identificationDocument",
         ),
         migrations.RenameField(
-            model_name='ocialuser',
-            old_name='typesfavEventType',
-            new_name='typesFavEventType',
+            model_name="ocialuser",
+            old_name="typesfavEventType",
+            new_name="typesFavEventType",
         ),
     ]
