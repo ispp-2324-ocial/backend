@@ -13,11 +13,13 @@ class RatingCreateSerializer(serializers.ModelSerializer):
         model = Rating
         fields = "__all__"
 
+
 class OcialClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OcialClient
         fields = ["name", "defaultLatitude", "defaultLongitude"]
+
 
 class EventSerializer(serializers.ModelSerializer):
     ocialClient = OcialClientSerializer()
