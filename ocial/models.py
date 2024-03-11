@@ -8,6 +8,7 @@ class Category(Enum):
     RELAX_ACTIVITIES = "Relax activities"  # , ("Relax activities")
     LIVE_CONCERT = "Live concert"  # , ("Live concert")
 
+
 class TypeClient(Enum):
     SMALL_BUSINESS = "Small business"
     ARTIST = "Artist"
