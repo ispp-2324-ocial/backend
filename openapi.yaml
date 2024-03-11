@@ -1,0 +1,723 @@
+openapi: 3.0.3
+info:
+  title: Ocial API
+  version: 1.1.2
+paths:
+  /api/chat/{chat_id}/createMessage/:
+    post:
+      operationId: chat_createMessage_create
+      description: Create a new message in a chat
+      parameters:
+      - in: path
+        name: chat_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+        '400':
+          description: Error in request
+  /api/chat/{id}/delete/:
+    delete:
+      operationId: chat_delete_destroy
+      description: Delete a chat
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: Chat deleted successfully
+        '404':
+          description: Chat not found
+  /api/chat/{id}/deleteMessage/:
+    delete:
+      operationId: chat_deleteMessage_destroy
+      description: Delete a message
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: Message deleted successfully
+        '404':
+          description: Message not found
+  /api/chat/{id}/messages:
+    get:
+      operationId: chat_messages_retrieve
+      description: Detail of a chat
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+          description: ''
+        '404':
+          description: Chat not found
+  /api/chat/create/:
+    post:
+      operationId: chat_create_create
+      description: Create a new chat
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Chat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Chat'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+          description: ''
+        '400':
+          description: Error in request
+  /api/chat/list/:
+    get:
+      operationId: chat_list_list
+      description: List of chats
+      tags:
+      - chat
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+          description: ''
+        '400':
+          description: Error in request
+  /api/event/{id}/delete/:
+    delete:
+      operationId: event_delete_destroy
+      description: Delete an event
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: Event deleted successfully
+        '404':
+          description: Message not found
+  /api/event/{id}/update/:
+    put:
+      operationId: event_update_update
+      description: Update an event
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Event'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Event'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          description: No response body
+        '400':
+          description: Error in request
+    patch:
+      operationId: event_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEvent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEvent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEvent'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+  /api/event/create/:
+    post:
+      operationId: event_create_create
+      description: Create a new event
+      tags:
+      - event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Event'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Event'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          description: No response body
+        '400':
+          description: Error in request
+  /api/event/list/:
+    get:
+      operationId: event_list_list
+      description: List of events
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+        '400':
+          description: Error in request
+  /api/event/list/client/{id}/:
+    get:
+      operationId: event_list_client_list
+      description: List of events by client id
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+        '400':
+          description: Error in request
+  /api/event/nearby/:
+    get:
+      operationId: event_nearby_list
+      description: List of events near a location
+      parameters:
+      - in: query
+        name: latitude
+        schema:
+          type: number
+          format: double
+        description: Latitude of the center point
+        required: true
+      - in: query
+        name: longitude
+        schema:
+          type: number
+          format: double
+        description: Longitude of the center point
+        required: true
+      - in: query
+        name: radius
+        schema:
+          type: number
+          format: double
+        description: Radius in kilometers
+        required: true
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+        '400':
+          description: Error in request
+  /api/event/rating/{id}/delete/:
+    delete:
+      operationId: event_rating_delete_destroy
+      description: Delete a rating
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: Rating deleted successfully
+        '404':
+          description: Message not found
+  /api/users/client/register/:
+    post:
+      operationId: users_client_register_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Client'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Client'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+        '400':
+          description: Los datos de la petición son incorrectos
+        '409':
+          description: El nombre de usuario ya existe
+  /api/users/login/:
+    post:
+      operationId: users_login_create
+      description: Inicia la sesión del usuario y devuelve el token de autenticación
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginUser'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+          description: Token de autenticación
+        '400':
+          description: Los datos de la petición son incorrectos
+        '401':
+          description: Las credenciales son incorrectas
+  /api/users/logout/:
+    post:
+      operationId: users_logout_create
+      description: Cierra la sesión del usuario
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+        '304':
+          description: Django ha detectado un usuario, pero el token no existe, por
+            lo que se considera que la sesión está cerrada
+        '401':
+          description: El usuario no está autenticado
+  /api/users/user/register/:
+    post:
+      operationId: users_user_register_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+        '400':
+          description: Los datos de la petición son incorrectos
+        '409':
+          description: El nombre de usuario ya existe
+components:
+  schemas:
+    CategoryEnum:
+      enum:
+      - Sports
+      - Music
+      - Markets
+      - Relax activities
+      - Live concert
+      type: string
+      description: |-
+        * `Sports` - SPORTS
+        * `Music` - MUSIC
+        * `Markets` - MARKETS
+        * `Relax activities` - RELAX_ACTIVITIES
+        * `Live concert` - LIVE_CONCERT
+    Chat:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+          readOnly: true
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          writeOnly: true
+        email:
+          type: string
+          format: email
+          writeOnly: true
+        username:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+        identification_document:
+          type: string
+          maxLength: 9
+        typeClient:
+          $ref: '#/components/schemas/TypeClientEnum'
+        default_latitude:
+          type: number
+          format: double
+        default_longitude:
+          type: number
+          format: double
+        usuario:
+          type: integer
+      required:
+      - default_latitude
+      - default_longitude
+      - identification_document
+      - name
+      - password
+      - username
+      - usuario
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        place:
+          type: string
+        event:
+          type: string
+        date:
+          type: string
+          format: date
+        hour:
+          type: string
+          format: time
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        ocialClient:
+          type: integer
+      required:
+      - date
+      - event
+      - hour
+      - latitude
+      - longitude
+      - name
+      - ocialClient
+      - place
+    LoginUser:
+      type: object
+      description: |-
+        Serializer for user login.
+
+        Fields:
+        - `username` (string): The username of the user.
+        - `password` (string): The password of the user.
+      properties:
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          maxLength: 128
+      required:
+      - password
+      - username
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+          maxLength: 255
+        chat:
+          type: integer
+      required:
+      - chat
+      - content
+    MessageCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+          maxLength: 255
+        chat:
+          type: integer
+      required:
+      - chat
+      - content
+    PatchedEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        place:
+          type: string
+        event:
+          type: string
+        date:
+          type: string
+          format: date
+        hour:
+          type: string
+          format: time
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        ocialClient:
+          type: integer
+    TokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          readOnly: true
+        isClient:
+          type: boolean
+      required:
+      - isClient
+    TypeClientEnum:
+      enum:
+      - Small business
+      - Artist
+      - Bar Restaurant
+      - Local Guide
+      - Events And Concerts
+      type: string
+      description: |-
+        * `Small business` - SMALL_BUSINESS
+        * `Artist` - ARTIST
+        * `Bar Restaurant` - BAR_RESTAURANT
+        * `Local Guide` - LOCAL_GUIDE
+        * `Events And Concerts` - EVENTS_AND_CONCERTS
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          writeOnly: true
+        email:
+          type: string
+          format: email
+          writeOnly: true
+        username:
+          type: string
+          writeOnly: true
+        lastKnowLocLat:
+          type: number
+          format: double
+        lastKnowLocLong:
+          type: number
+          format: double
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        usuario:
+          type: integer
+      required:
+      - lastKnowLocLat
+      - lastKnowLocLong
+      - password
+      - username
+      - usuario
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
