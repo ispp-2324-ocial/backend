@@ -22,18 +22,12 @@ class OcialUser(models.Model):
 
 
 class OcialClient(models.Model):
-    class TypeClient(models.TextChoices):
-        SMALL_BUSINESS = 0, ("Small business")
-        ARTIST = 1, ("Artist")
-        BAR_RESTAURANT = 2, ("Bar Restaurant")
-        LOCAL_GUIDE = 3, ("Local Guide")
-        EVENTS_AND_CONCERTS = 4, ("Events And Concerts")
-
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.TextField()
     identification_document = ESIdentityCardNumberField()
     typeClient = models.TextField(
-        choices=TypeClient.choices, default=TypeClient.SMALL_BUSINESS
+        choices=[(typeclient.value, typeclient.name) for typeclient in TypeClient],
+        default=TypeClient.SMALL_BUSINESS.value,
     )
     default_latitude = models.FloatField()
     default_longitude = models.FloatField()
