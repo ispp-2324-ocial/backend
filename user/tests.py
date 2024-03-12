@@ -3,6 +3,8 @@ from .models import OcialUser, OcialClient
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework.authtoken.models import Token
+from django.urls import reverse
 
 class OcialUserTestCase(TestCase):
     def setUp(self):
@@ -95,27 +97,66 @@ class OcialUserTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("token", response.data)
 
-    # def test_logout_user(self):
-    #     # Crear un usuario en la base de datos
-    #     User.objects.create_user(username=self.user_data['username'], email=self.user_data['email'], password=self.user_data['password'])
-        
-    #     # Autenticar al usuario antes de intentar cerrar sesión
-    #     self.client.login(username="testuser", password="testpassword")
-        
-    #     # Realizar la solicitud para cerrar sesión
-    #     response = self.client.post("/api/users/logout/", format="json")
-        
-    #     # Verificar si la solicitud fue exitosa y si el token no está presente en la respuesta
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertFalse("token" in response.data)
+    def test_logout_user(self):
+        user = User.objects.create_user(username=self.user_data['username'], email=self.user_data['email'], password=self.user_data['password'])
+        response = self.client.post("/api/users/login/", {"username": user.username, "password": self.user_data['password']}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # def test_register_user_view(self):
-    #     response = self.client.post("/api/register-user/", self.user_data, format="json")
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertTrue(User.objects.filter(username="testuser").exists())
+        token = response.data.get("token")
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + token)
+        response = self.client.post("/api/users/logout/", format="json")
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(Token.objects.filter(user=user).exists())
 
-    # def test_register_client_view(self):
-    #     response = self.client.post("/api/register-client/", self.client_data, format="json")
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertTrue(User.objects.filter(username="testclient").exists())
+    def test_create_user_invalid_data(self):
+        # Try to create a user without username
+        invalid_user_data = {
+            "password": "testpassword",
+            "email": "test@example.com",
+            # Missing usernave
+        }
+        response = self.client.post("/api/users/user/register/", invalid_user_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_client_invalid_data(self):
+        # Try to create a client without name
+        invalid_client_data = {
+            "username": "testclient",
+            "password": "testpassword",
+            "email": "client@example.com",
+            # Missing name
+            "identification_document": "A12345678",
+            "typeClient": OcialClient.TypeClient.ARTIST,
+            "default_latitude": 40.7128,
+            "default_longitude": -40.7128,
+        }
+        response = self.client.post("/api/users/client/register/", invalid_client_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_user_invalid_credentials(self):
+        invalid_credentials = {
+            "username": "incorrect_username",
+            "password": "incorrect_password",
+        }
+        response = self.client.post("/api/users/login/", invalid_credentials, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_logout_user_unauthenticated(self):
+        # Try to logout without auth
+        response = self.client.post("/api/users/logout/", format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_register_user_duplicate_username(self):
+        User.objects.create_user(username='testuser', password='testpassword')
+        url = reverse('user_register')
+        data = {
+            'username': 'testuser',
+            'password': 'testpassword',
+            'email': 'test@example.com',
+            'lastKnowLocLat': 40.0,
+            'lastKnowLocLong': 40.0,
+            'typesfavEventType': 1,
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
