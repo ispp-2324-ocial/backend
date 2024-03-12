@@ -6,6 +6,7 @@ from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
 from django.urls import reverse
 
+
 class OcialUserTestCase(TestCase):
     def setUp(self):
         self.user_1 = User.objects.create_user(
@@ -21,7 +22,7 @@ class OcialUserTestCase(TestCase):
             "ocialuser4", "chevy@chase.com", "chevyspassword"
         )
 
-        self.user1= OcialUser.objects.create(
+        self.user1 = OcialUser.objects.create(
             usuario=self.user_1,
             lastKnowLocLat=40.0,
             lastKnowLocLong=45.0,
@@ -82,30 +83,50 @@ class OcialUserTestCase(TestCase):
         self.assertEqual(self.user4.typeClient, OcialClient.TypeClient.SMALL_BUSINESS)
 
     def testCreateUser(self):
-        response = self.client.post("/api/users/user/register/", self.user_data, format="json")
+        response = self.client.post(
+            "/api/users/user/register/", self.user_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(User.objects.filter(username="testuser").exists())
 
     def testCreateClient(self):
-        response = self.client.post("/api/users/client/register/", self.client_data, format="json")
+        response = self.client.post(
+            "/api/users/client/register/", self.client_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(User.objects.filter(username="testclient").exists())
 
     def testLoginUser(self):
-        User.objects.create_user(username=self.user_data['username'], email=self.user_data['email'], password=self.user_data['password'])
-        response = self.client.post("/api/users/login/", {"username": "testuser", "password": "testpassword"}, format="json")
+        User.objects.create_user(
+            username=self.user_data["username"],
+            email=self.user_data["email"],
+            password=self.user_data["password"],
+        )
+        response = self.client.post(
+            "/api/users/login/",
+            {"username": "testuser", "password": "testpassword"},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("token", response.data)
 
     def testLogoutUser(self):
-        user = User.objects.create_user(username=self.user_data['username'], email=self.user_data['email'], password=self.user_data['password'])
-        response = self.client.post("/api/users/login/", {"username": user.username, "password": self.user_data['password']}, format="json")
+        user = User.objects.create_user(
+            username=self.user_data["username"],
+            email=self.user_data["email"],
+            password=self.user_data["password"],
+        )
+        response = self.client.post(
+            "/api/users/login/",
+            {"username": user.username, "password": self.user_data["password"]},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         token = response.data.get("token")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token)
         response = self.client.post("/api/users/logout/", format="json")
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(Token.objects.filter(user=user).exists())
 
@@ -116,7 +137,9 @@ class OcialUserTestCase(TestCase):
             "email": "test@example.com",
             # Missing username
         }
-        response = self.client.post("/api/users/user/register/", invalid_user_data, format="json")
+        response = self.client.post(
+            "/api/users/user/register/", invalid_user_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def testCreateUserMissingEmail(self):
@@ -126,7 +149,9 @@ class OcialUserTestCase(TestCase):
             # Missing email
             "username": "test",
         }
-        response = self.client.post("/api/users/user/register/", invalid_user_data, format="json")
+        response = self.client.post(
+            "/api/users/user/register/", invalid_user_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def testCreateUserMissinPassword(self):
@@ -136,7 +161,9 @@ class OcialUserTestCase(TestCase):
             "email": "test@example.com",
             "username": "test",
         }
-        response = self.client.post("/api/users/user/register/", invalid_user_data, format="json")
+        response = self.client.post(
+            "/api/users/user/register/", invalid_user_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def testCreateClientInvalidData(self):
@@ -151,7 +178,9 @@ class OcialUserTestCase(TestCase):
             "default_latitude": 40.7128,
             "default_longitude": -40.7128,
         }
-        response = self.client.post("/api/users/client/register/", invalid_client_data, format="json")
+        response = self.client.post(
+            "/api/users/client/register/", invalid_client_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def testLoginUserInvalidCredentials(self):
@@ -159,7 +188,9 @@ class OcialUserTestCase(TestCase):
             "username": "incorrect_username",
             "password": "incorrect_password",
         }
-        response = self.client.post("/api/users/login/", invalid_credentials, format="json")
+        response = self.client.post(
+            "/api/users/login/", invalid_credentials, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def testLogoutUserUnauthenticated(self):
@@ -168,15 +199,15 @@ class OcialUserTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def testRegisterUserDuplicateUsername(self):
-        User.objects.create_user(username='testuser', password='testpassword')
-        url = reverse('user_register')
+        User.objects.create_user(username="testuser", password="testpassword")
+        url = reverse("user_register")
         data = {
-            'username': 'testuser',
-            'password': 'testpassword',
-            'email': 'test@example.com',
-            'lastKnowLocLat': 40.0,
-            'lastKnowLocLong': 40.0,
-            'typesfavEventType': 1,
+            "username": "testuser",
+            "password": "testpassword",
+            "email": "test@example.com",
+            "lastKnowLocLat": 40.0,
+            "lastKnowLocLong": 40.0,
+            "typesfavEventType": 1,
         }
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
