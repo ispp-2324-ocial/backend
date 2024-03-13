@@ -6,28 +6,46 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0001_initial'),
+        ("user", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='ocialclient',
-            name='typeClient',
-            field=models.TextField(choices=[('Small business', 'SMALL_BUSINESS'), ('Artist', 'ARTIST'), ('Bar Restaurant', 'BAR_RESTAURANT'), ('Local Guide', 'LOCAL_GUIDE'), ('Events And Concerts', 'EVENTS_AND_CONCERTS')], default='Small business'),
+            model_name="ocialclient",
+            name="typeClient",
+            field=models.TextField(
+                choices=[
+                    ("Small business", "SMALL_BUSINESS"),
+                    ("Artist", "ARTIST"),
+                    ("Bar Restaurant", "BAR_RESTAURANT"),
+                    ("Local Guide", "LOCAL_GUIDE"),
+                    ("Events And Concerts", "EVENTS_AND_CONCERTS"),
+                ],
+                default="Small business",
+            ),
         ),
         migrations.AlterField(
-            model_name='ocialuser',
-            name='category',
-            field=models.TextField(choices=[('Sports', 'SPORTS'), ('Music', 'MUSIC'), ('Markets', 'MARKETS'), ('Relax activities', 'RELAX_ACTIVITIES'), ('Live concert', 'LIVE_CONCERT')], default='Sports'),
+            model_name="ocialuser",
+            name="category",
+            field=models.TextField(
+                choices=[
+                    ("Sports", "SPORTS"),
+                    ("Music", "MUSIC"),
+                    ("Markets", "MARKETS"),
+                    ("Relax activities", "RELAX_ACTIVITIES"),
+                    ("Live concert", "LIVE_CONCERT"),
+                ],
+                default="Sports",
+            ),
         ),
         migrations.AlterField(
-            model_name='ocialuser',
-            name='lastKnowLocLat',
+            model_name="ocialuser",
+            name="lastKnowLocLat",
             field=models.FloatField(),
         ),
         migrations.AlterField(
-            model_name='ocialuser',
-            name='lastKnowLocLong',
+            model_name="ocialuser",
+            name="lastKnowLocLong",
             field=models.FloatField(),
         ),
     ]

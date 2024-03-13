@@ -24,7 +24,9 @@ class Event(models.Model):
     )
 
     def __str__(self):
-        return "{}: {} | {} -> {}".format(self.name, self.event, self.timeStart, self.timeEnd)
+        return "{}: {} | {} -> {}".format(
+            self.name, self.event, self.timeStart, self.timeEnd
+        )
 
     def save(self, *args, **kwargs):
         is_new = not self.pk

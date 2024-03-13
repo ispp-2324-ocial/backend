@@ -6,31 +6,40 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('event', '0002_alter_event_category'),
+        ("event", "0002_alter_event_category"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='event',
-            name='date',
+            model_name="event",
+            name="date",
         ),
         migrations.RemoveField(
-            model_name='event',
-            name='hour',
+            model_name="event",
+            name="hour",
         ),
         migrations.AddField(
-            model_name='event',
-            name='timeEnd',
-            field=models.DateTimeField(default='1030-01-01 10:00:00'),
+            model_name="event",
+            name="timeEnd",
+            field=models.DateTimeField(default="1030-01-01 10:00:00"),
         ),
         migrations.AddField(
-            model_name='event',
-            name='timeStart',
-            field=models.DateTimeField(default='1030-01-01 09:00:00'),
+            model_name="event",
+            name="timeStart",
+            field=models.DateTimeField(default="1030-01-01 09:00:00"),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='category',
-            field=models.TextField(choices=[('Sports', 'SPORTS'), ('Music', 'MUSIC'), ('Markets', 'MARKETS'), ('Relax activities', 'RELAX_ACTIVITIES'), ('Live concert', 'LIVE_CONCERT')], default='Sports'),
+            model_name="event",
+            name="category",
+            field=models.TextField(
+                choices=[
+                    ("Sports", "SPORTS"),
+                    ("Music", "MUSIC"),
+                    ("Markets", "MARKETS"),
+                    ("Relax activities", "RELAX_ACTIVITIES"),
+                    ("Live concert", "LIVE_CONCERT"),
+                ],
+                default="Sports",
+            ),
         ),
     ]
