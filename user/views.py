@@ -210,11 +210,9 @@ class RegisterClientView(APIView):
         form = UserCreationForm(userdata)
         if form.is_valid():
             userCreated = form.save()
-            dni = data.get("identificationDocument")
-            dni = dni[:-1] + dni[-1].upper()
             ocialclientdata = {
                 "name": data.get("name"),
-                "identificationDocument": dni,
+                "identificationDocument": data.get("identificationDocument"),
                 "typeClient": data.get("typeClient"),
                 "defaultLatitude": data.get("defaultLatitude"),
                 "defaultLongitude": data.get("defaultLongitude"),
