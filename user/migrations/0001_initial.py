@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ("lastKnowLocLat", models.FloatField(default=0.0)),
                 ("lastKnowLocLong", models.FloatField(default=0.0)),
                 (
-                    "typesfavEventType",
+                    "category",
                     models.TextField(
                         choices=[
                             ("0", "Sports"),

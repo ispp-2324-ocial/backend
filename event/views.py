@@ -84,8 +84,8 @@ class EventCreate(generics.CreateAPIView):
             "name": data.get("name"),
             "place": data.get("place"),
             "event": data.get("event"),
-            "date": data.get("date"),
-            "hour": data.get("hour"),
+            "timeStart": data.get("timeStart"),
+            "timeEnd": data.get("timeEnd"),
             "capacity": data.get("capacity"),
             "category": data.get("category"),
             "latitude": data.get("latitude"),
@@ -167,8 +167,8 @@ class EventUpdate(generics.UpdateAPIView):
             "name": data.get("name"),
             "place": data.get("place"),
             "event": data.get("event"),
-            "date": data.get("date"),
-            "hour": data.get("hour"),
+            "timeStart": data.get("timeStart"),
+            "timeEnd": data.get("timeEnd"),
             "capacity": data.get("capacity"),
             "category": data.get("category"),
             "latitude": data.get("latitude"),
@@ -181,8 +181,8 @@ class EventUpdate(generics.UpdateAPIView):
             eventUpdate.name = data.get("name")
             eventUpdate.place = data.get("place")
             eventUpdate.event = data.get("event")
-            eventUpdate.date = data.get("date")
-            eventUpdate.hour = data.get("hour")
+            eventUpdate.timeStart = data.get("timeStart")
+            eventUpdate.timeEnd = data.get("timeEnd")
             eventUpdate.capacity = data.get("capacity")
             eventUpdate.category = data.get("category")
             eventUpdate.latitude = data.get("latitude")

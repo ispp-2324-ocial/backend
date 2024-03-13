@@ -10,8 +10,8 @@ class Event(models.Model):
     name = models.TextField()
     place = models.TextField()
     event = models.TextField()
-    date = models.DateField()
-    hour = models.TimeField()
+    timeStart = models.DateTimeField(default="1030-01-01 09:00:00")
+    timeEnd = models.DateTimeField(default="1030-01-01 10:00:00")
     capacity = models.PositiveIntegerField(default=0)
     category = models.TextField(
         choices=[(category.value, category.name) for category in Category],
@@ -24,7 +24,7 @@ class Event(models.Model):
     )
 
     def __str__(self):
-        return "{}: {} | {}, {}".format(self.name, self.event, self.date, self.hour)
+        return "{}: {} | {} -> {}".format(self.name, self.event, self.timeStart, self.timeEnd)
 
     def save(self, *args, **kwargs):
         is_new = not self.pk
@@ -34,8 +34,8 @@ class Event(models.Model):
             self.name
             self.place
             self.event
-            self.date
-            self.hour
+            self.timeStart
+            self.timeEnd
             self.capacity
             self.category
             self.latitude

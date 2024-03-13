@@ -52,7 +52,7 @@ class RegisterUserView(APIView):
             ocialuserdata = {
                 "lastKnowLocLat": data.get("lastKnowLocLat"),
                 "lastKnowLocLong": data.get("lastKnowLocLong"),
-                "typesfavEventType": data.get("typesfavEventType"),
+                "category": data.get("category"),
                 "usuario": userCreated,
             }
             ocialuserform = OcialUserForm(ocialuserdata)
