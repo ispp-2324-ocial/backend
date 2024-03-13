@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ("lastKnowLocLat", models.FloatField(default=0.0)),
                 ("lastKnowLocLong", models.FloatField(default=0.0)),
                 (
-                    "typesfavEventType",
+                    "category",
                     models.TextField(
                         choices=[
                             ("0", "Sports"),
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "usuario",
+                    "djangoUser",
                     models.OneToOneField(
                         on_delete=django.db.models.deletion.CASCADE,
                         to=settings.AUTH_USER_MODEL,
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
                 ),
                 ("name", models.TextField()),
                 (
-                    "identification_document",
+                    "identificationDocument",
                     localflavor.es.models.ESIdentityCardNumberField(max_length=9),
                 ),
                 (
@@ -81,10 +81,10 @@ class Migration(migrations.Migration):
                         default="0",
                     ),
                 ),
-                ("default_latitude", models.FloatField()),
-                ("default_longitude", models.FloatField()),
+                ("defaultLatitude", models.FloatField()),
+                ("defaultLongitude", models.FloatField()),
                 (
-                    "usuario",
+                    "djangoUser",
                     models.OneToOneField(
                         on_delete=django.db.models.deletion.CASCADE,
                         to=settings.AUTH_USER_MODEL,
