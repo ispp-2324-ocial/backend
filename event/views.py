@@ -129,9 +129,9 @@ class EventCreate(generics.CreateAPIView):
         eventdata = {
             "name": data.get("name"),
             "place": data.get("place"),
-            "description": data.get("description"),
-            "date": data.get("date"),
-            "hour": data.get("hour"),
+            "event": data.get("event"),
+            "timeStart": data.get("timeStart"),
+            "timeEnd": data.get("timeEnd"),
             "capacity": data.get("capacity"),
             "category": data.get("category"),
             "latitude": data.get("latitude"),
@@ -285,9 +285,9 @@ class EventUpdate(APIView):
         eventdata = {
             "name": data.get("name"),
             "place": data.get("place"),
-            "description": data.get("description"),
-            "date": data.get("date"),
-            "hour": data.get("hour"),
+            "event": data.get("event"),
+            "timeStart": data.get("timeStart"),
+            "timeEnd": data.get("timeEnd"),
             "capacity": data.get("capacity"),
             "category": data.get("category"),
             "latitude": data.get("latitude"),
@@ -299,9 +299,9 @@ class EventUpdate(APIView):
             eventUpdate = Event.objects.filter(id=kwargs["pk"])[0]
             eventUpdate.name = data.get("name")
             eventUpdate.place = data.get("place")
-            eventUpdate.description = data.get("description")
-            eventUpdate.date = data.get("date")
-            eventUpdate.hour = data.get("hour")
+            eventUpdate.event = data.get("event")
+            eventUpdate.timeStart = data.get("timeStart")
+            eventUpdate.timeEnd = data.get("timeEnd")
             eventUpdate.capacity = data.get("capacity")
             eventUpdate.category = data.get("category")
             eventUpdate.latitude = data.get("latitude")
