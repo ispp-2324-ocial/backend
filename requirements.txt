@@ -8,3 +8,4 @@ psycopg2-binary==2.9.9
 drf-spectacular==0.26.5
 django-localflavor
 python-dotenv==1.0.1
+channels-redis

@@ -43,7 +43,7 @@ REST_FRAMEWORK = {
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
+    "channels",
     "event",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -108,7 +108,16 @@ TEMPLATES = [
 
 # WSGI_APPLICATION = 'ocial.wsgi.application'
 # Channels
-ASGI_APPLICATION = "ocial.asgi.application"
+ASGI_APPLICATION  = "ocial.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
