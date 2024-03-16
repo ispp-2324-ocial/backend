@@ -41,7 +41,12 @@ class RegisterUserView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-        request.data
+        if User.objects.filter(email=email).exists():
+            return Response(
+                {"error": "El correo ya está registrado"},
+                status=status.HTTP_409_CONFLICT,
+            )
+
         userdata = {
             "username": username,
             "password1": password,
@@ -52,10 +57,12 @@ class RegisterUserView(APIView):
         if form.is_valid():
             userCreated = form.save()
             ocialuserdata = {
-                "lastKnowLocLat": data.get("lastKnowLocLat"),
-                "lastKnowLocLong": data.get("lastKnowLocLong"),
-                "typesFavEventType": data.get("typesFavEventType"),
+                "lastKnowLocLat": request.data.get("lastKnowLocLat"),
+                "lastKnowLocLong": request.data.get("lastKnowLocLong"),
+                "typesFavEventType": request.data.get("typesFavEventType"),
                 "djangoUser": userCreated,
+                "usuario": userCreated,
+                "auth_provider": "email",
             }
             ocialuserform = OcialUserForm(ocialuserdata)
             if ocialuserform.is_valid():
@@ -199,6 +206,12 @@ class RegisterClientView(APIView):
         if User.objects.filter(username=username).exists():
             return Response(
                 {"error": "El nombre de usuario ya existe"},
+                status=status.HTTP_409_CONFLICT,
+            )
+        
+        if User.objects.filter(email=email).exists():
+            return Response(
+                {"error": "El correo ya está registrado"},
                 status=status.HTTP_409_CONFLICT,
             )
 
