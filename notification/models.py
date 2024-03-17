@@ -1,8 +1,28 @@
+from user.models import OcialClient
 from django.db import models
-from user.models import OcialClient, OcialUser
+
+
+#esto pasarlo a ocial.models
+STATUS = (
+    (0, "Draft"),
+    (1, "Publish"),
+    (2, "Archive"),
+)
+
 
 class Notification(models.Model):
-    user_sender=models.ForeignKey(OcialClient,null=True,blank=True,related_name='user_sender',on_delete=models.CASCADE)
-    user_receiver=models.ForeignKey(OcialUser,null=True,blank=True,related_name='user_receiver',on_delete=models.CASCADE)
-    status=models.CharField(max_length=264,null=True,blank=True,default="unread")
-    type_of_notification=models.CharField(max_length=264,null=True,blank=True)
+
+    title = models.CharField(max_length=200, unique=True)
+    content = models.TextField()
+    status = models.IntegerField(choices=STATUS, default=0)
+
+    author = models.ForeignKey(
+        OcialClient,
+        related_name="blog_posts",
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
