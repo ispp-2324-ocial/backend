@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.openapi import OpenApiResponse
@@ -23,6 +23,29 @@ class SubscriptionList(generics.ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+    
+class SubscriptionListByClient(generics.ListAPIView):
+    serializer_class = SubscriptionSerializer
+
+    @extend_schema(
+        description="Subscription by client id",
+        responses={
+            200: OpenApiResponse(response=SubscriptionSerializer(many=True)),
+            400: OpenApiResponse(response=None, description="Error in request"),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        if not User.objects.filter(id=request.user.id).exists():
+            return Response(
+                {"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        # Get list of subscription if client has subscription, otherwise []
+        ocialClient = OcialClient.objects.filter(usuario=kwargs["pk"])
+        if ocialClient:
+            suscripciones = Subscription.objects.filter(ocialClientId=ocialClient[0].id)
+            serialized_subscription = [SubscriptionSerializer(suscripcion).data for suscripcion in suscripciones]
+            return Response(serialized_subscription, status=status.HTTP_200_OK)
+        return Response([], status=status.HTTP_200_OK)
 
 class SubscriptionCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated] 
@@ -95,3 +118,113 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+class SubscriptionDelete(generics.DestroyAPIView):
+
+    @extend_schema(
+        description="Delete a subscription",
+        responses={
+            204: OpenApiResponse(description="Subscription deleted successfully"),
+            404: OpenApiResponse(response=None, description="Message not found"),
+        },
+    )
+    def delete(self, request, *args, **kwargs):
+
+        if not User.objects.filter(id=request.user.id).exists():
+            return Response(
+                {"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        ocialClient = OcialClient.objects.filter(usuario=request.user)
+        subscriptionAct = Subscription.objects.filter(id=kwargs["pk"])
+        #Por alguna razon subscriptionAct[0].ocialClientId devuelve "string" en vez del ocialClientId
+        """
+        if not (ocialClient[0].id == subscriptionAct[0].ocialClientId):
+            return Response(
+                {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
+            )
+        """
+        if subscriptionAct.exists():
+            subscriptionAct.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class SubscriptionUpdate(generics.UpdateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = SubscriptionSerializer
+
+    @extend_schema(
+        request=SubscriptionSerializer,
+        description="Update an subscription",
+        responses={
+            201: OpenApiResponse(response=None),
+            400: OpenApiResponse(response=None, description="Error in request"),
+        },
+    )
+    def put(self, request, *args, **kwargs):
+        type_subscription = request.data.get('typeSubscription') 
+        if not User.objects.filter(id=request.user.id).exists():
+            return Response(
+                {"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        ocialClient = OcialClient.objects.filter(usuario=request.user)
+        subscriptionAct = Subscription.objects.filter(id=kwargs["pk"])
+        print(subscriptionAct[0].ocialClient.id)
+        if not (ocialClient[0].id == subscriptionAct[0].ocialClient.id):
+            return Response(
+                {"error": "No puedes actualizar datos de un evento de otro cliente"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        ocialClient = ocialClient[0]
+        request.data["ocialClient"] = ocialClient.id
+        data = request.data
+
+        subscription_data = {}
+        if type_subscription == 'Free':
+            subscription_data = {
+                'typeSubscription': 'Free',
+                'numEvents': 1,
+                'canEditEvent': False,
+                'canSendNotifications': False,
+                'canHaveRecurrentEvents': False,
+                'canHaveOustandingEvents': False,
+                'canHaveRating': False,
+                "ocialClientId": data.get("ocialClientId"),
+            }
+        elif type_subscription == 'Basic':
+            subscription_data = {
+                'typeSubscription': 'Basic',
+                'numEvents': 10,
+                'canEditEvent': True,
+                'canSendNotifications': False,
+                'canHaveRecurrentEvents': False,
+                'canHaveOustandingEvents': False,
+                'canHaveRating': False,
+                "ocialClientId": data.get("ocialClientId"),
+            }
+        elif type_subscription == 'Pro':
+            subscription_data = {
+                'typeSubscription': 'Pro',
+                'numEvents': 100000,
+                'canEditEvent': True,
+                'canSendNotifications': True,
+                'canHaveRecurrentEvents': True,
+                'canHaveOustandingEvents': True,
+                'canHaveRating': True,
+                "ocialClientId": data.get("ocialClientId"),
+            }
+        subscriptionform = SubscriptionForm(subscription_data)
+        if subscriptionform.is_valid():
+            subscriptionUpdate = Subscription.objects.filter(id=kwargs["pk"])[0]
+            subscriptionUpdate.typeSubscription = data.get("typeSubscription")
+            subscriptionUpdate.numEvents = data.get("numEvents")
+            subscriptionUpdate.canEditEvent = data.get("canEditEvent")
+            subscriptionUpdate.canSendNotifications = data.get("canSendNotifications")
+            subscriptionUpdate.canHaveRecurrentEvents = data.get("canHaveRecurrentEvents")
+            subscriptionUpdate.canHaveOustandingEvents = data.get("canHaveOustandingEvents")
+            subscriptionUpdate.canHaveRating = data.get("canHaveRating")
+            subscriptionUpdate.ocialClientId = data.get("ocialClientId")
+            subscriptionUpdate.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(subscriptionform.errors, status=status.HTTP_400_BAD_REQUEST)
