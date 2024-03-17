@@ -24,9 +24,7 @@ class SubscriptionList(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-class SubscriptionListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Subscription.objects.all()
-    serializer_class = SubscriptionSerializer
+class SubscriptionCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated] 
 
     @extend_schema(
