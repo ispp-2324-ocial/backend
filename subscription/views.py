@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 from rest_framework import generics, status, permissions
+=======
+from rest_framework import generics, status
+>>>>>>> 67aea12 (feat(subscription): Creación CRUD Modelo Subscriptions)
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.openapi import OpenApiResponse
 from .models import Subscription
+<<<<<<< HEAD
 from .serializers import *
+=======
+from .serializers import SubscriptionSerializer
+>>>>>>> 67aea12 (feat(subscription): Creación CRUD Modelo Subscriptions)
 from django.contrib.auth.models import User
 from user.models import OcialClient
 from rest_framework.permissions import IsAuthenticated
@@ -23,6 +31,7 @@ class SubscriptionList(generics.ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+<<<<<<< HEAD
     
 class SubscriptionListByClient(generics.ListAPIView):
     serializer_class = SubscriptionSerializer
@@ -48,11 +57,21 @@ class SubscriptionListByClient(generics.ListAPIView):
         return Response([], status=status.HTTP_200_OK)
 
 class SubscriptionCreate(generics.CreateAPIView):
+=======
+
+class SubscriptionListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+>>>>>>> 67aea12 (feat(subscription): Creación CRUD Modelo Subscriptions)
     permission_classes = [IsAuthenticated] 
 
     @extend_schema(
         description="Create a new subscription with specific behavior based on subscription type.",
+<<<<<<< HEAD
         request=SubscriptionCreateUpdateSerializer,
+=======
+        request=SubscriptionSerializer,
+>>>>>>> 67aea12 (feat(subscription): Creación CRUD Modelo Subscriptions)
         responses={
             201: OpenApiResponse(response=SubscriptionSerializer),
             400: OpenApiResponse(response=None, description="Bad Request"),
@@ -70,6 +89,7 @@ class SubscriptionCreate(generics.CreateAPIView):
                 {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
             )
         ocialClient = ocialClient[0]
+<<<<<<< HEAD
         request.data["ocialClientId"] = ocialClient
         data = request.data
 
@@ -79,6 +99,11 @@ class SubscriptionCreate(generics.CreateAPIView):
                 {"error": "Este cliente ya tiene una suscripcion"}, status=status.HTTP_403_FORBIDDEN
             )
 
+=======
+        request.data["ocialClientId"] = ocialClient.id
+        data = request.data
+
+>>>>>>> 67aea12 (feat(subscription): Creación CRUD Modelo Subscriptions)
         subscription_data = {}
         if type_subscription == 'Free':
             subscription_data = {
@@ -124,6 +149,7 @@ class SubscriptionCreate(generics.CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+<<<<<<< HEAD
 class SubscriptionDelete(generics.DestroyAPIView):
 
     @extend_schema(
@@ -232,3 +258,5 @@ class SubscriptionUpdate(generics.UpdateAPIView):
             subscriptionUpdate.save()
             return Response(status=status.HTTP_200_OK)
         return Response(subscriptionform.errors, status=status.HTTP_400_BAD_REQUEST)
+=======
+>>>>>>> 67aea12 (feat(subscription): Creación CRUD Modelo Subscriptions)
