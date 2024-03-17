@@ -28,6 +28,7 @@ urlpatterns = [
     path("api/chat/", include("chat.urls")),
     path("api/users/", include("user.urls")),
     path("api/event/", include("event.urls")),
+    path("api/subscription", include("subscription.urls")),
     path("api/doc/openapi.yaml", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/doc/swagger/",
