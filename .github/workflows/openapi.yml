@@ -60,3 +60,13 @@ jobs:
           git add .
           git commit -m "ci: update OpenAPI schema" || echo
           git push
+
+      - name: Trigger generation workflow in axios-apiclient
+        if: ${{ steps.diff.outputs.count > 0 && github.event_name != 'pull_request' }}
+        uses: convictional/trigger-workflow-and-wait@v1.6.5
+        with:
+          owner: ispp-2324-ocial
+          repo: axios-apiclient
+          github_token: ${{ secrets.GH_TOKEN }}
+          workflow_file_name: generation.yml
+          wait_workflow: false          
