@@ -6,7 +6,7 @@ from ocial.models import *
 
 
 class OcialUser(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    djangoUser = models.OneToOneField(User, on_delete=models.CASCADE)
     auth_provider = models.TextField(
         choices=[(provider.value, provider.name) for provider in AuthProvider],
         default=AuthProvider.EMAIL.value,
