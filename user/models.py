@@ -24,7 +24,6 @@ class OcialUser(models.Model):
     )
     lastKnowLocLat = models.FloatField()
     lastKnowLocLong = models.FloatField()
->>>>>>> 28afc54 (feat(users): google social auth)
 
     def __str__(self):
         return self.djangoUser.username
