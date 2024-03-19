@@ -3,12 +3,18 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.openapi import OpenApiResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 from .serializers import *
 from django.db.models.functions import ACos, Cos, Radians, Sin
 from django.db.models import F
 from django.contrib.auth.models import User
 from user.models import OcialClient
 from .models import OcialEventForm
+import base64
+from django.core.files.base import ContentFile
+import blurhash
+from PIL import Image
+
 
 # Create your views here.
 from .models import Event, Rating, OcialClient
@@ -69,6 +75,7 @@ class EventListByClient(generics.ListAPIView):
 
 
 class EventCreate(generics.CreateAPIView):
+    serializer_class = EventSerializer
 
     @extend_schema(
         request=EventSerializer,
@@ -110,11 +117,27 @@ class EventCreate(generics.CreateAPIView):
             "category": data.get("category"),
             "latitude": data.get("latitude"),
             "longitude": data.get("longitude"),
+            "image": data.get("image"),
+            "blurhash": data.get("blurhash"),
             "ocialClient": data.get("ocialClient"),
         }
         eventform = OcialEventForm(eventdata)
         if eventform.is_valid():
             eventform.save()
+            format, imgstr = data.get("image").split(';base64,')
+            ext = format.split('/')[-1]
+            valid_ext = ['jpg', 'jpeg', 'png']
+            if ext not in valid_ext:
+                return Response(
+                    {"error": "Formato de imagen no válido"},
+                    status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                )
+            ocialClientName = ocialClient.name
+            eventform.instance.image = ContentFile(base64.b64decode(imgstr), name=ocialClientName + '-' + eventform.instance.name + '.' + ext)
+            eventform.instance.save()
+            image = Image.open(eventform.instance.image)
+            eventform.instance.blurhash = blurhash.encode(image, x_components=4, y_components=3)
+            eventform.instance.save()
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(
