@@ -206,7 +206,7 @@ class RegisterClientView(APIView):
                 {"error": "El nombre de usuario ya existe"},
                 status=status.HTTP_409_CONFLICT,
             )
-        
+
         if User.objects.filter(email=email).exists():
             return Response(
                 {"error": "El correo ya está registrado"},
