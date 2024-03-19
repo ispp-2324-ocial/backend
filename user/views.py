@@ -61,7 +61,6 @@ class RegisterUserView(APIView):
                 "lastKnowLocLong": request.data.get("lastKnowLocLong"),
                 "typesFavEventType": request.data.get("typesFavEventType"),
                 "djangoUser": userCreated,
-                "usuario": userCreated,
                 "auth_provider": "email",
             }
             ocialuserform = OcialUserForm(ocialuserdata)
