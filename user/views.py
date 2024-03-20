@@ -13,6 +13,11 @@ from .models import OcialClientForm
 from .models import OcialUserForm
 import random
 from django.conf import settings
+import base64
+from django.core.files.base import ContentFile
+import blurhash
+from PIL import Image
+from images.models import Image as ImageModel
 
 
 class RegisterUserView(APIView):
@@ -215,6 +220,7 @@ class RegisterClientView(APIView):
             )
 
         data = request.data
+        image = data.get("image")
         userdata = {
             "username": username,
             "password1": password,
@@ -245,6 +251,22 @@ class RegisterClientView(APIView):
                         status=status.HTTP_400_BAD_REQUEST,
                     )
                 ocialclientform.save()
+                if image: 
+                    format, imgstr = data.get("image").split(';base64,')
+                    ext = format.split('/')[-1]
+                    valid_ext = ['jpg', 'jpeg', 'png']
+                    if ext not in valid_ext:
+                        return Response(
+                            {"error": "Formato de imagen no válido"},
+                            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        )
+                    imagefile = ContentFile(base64.b64decode(imgstr), name=f'client-{ocialclientform.instance.id}.{ext}')
+                    image = ImageModel.objects.create(
+                        image=imagefile,
+                        blurhash=blurhash.encode(Image.open(imagefile), x_components=4, y_components=3)
+                    )
+                    ocialclientform.instance.image = image
+                    ocialclientform.instance.save()
                 return Response(status=status.HTTP_200_OK)
             else:
                 userCreated.delete()

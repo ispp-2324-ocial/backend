@@ -3,6 +3,7 @@ from user.models import OcialClient, OcialUser
 from django.contrib.auth.models import User
 from . import google
 from django.conf import settings
+from images.serializers import ImageSerializer
 
 
 class DjangoUserSerializer(serializers.ModelSerializer):
@@ -27,6 +28,8 @@ class ClientSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     email = serializers.EmailField(write_only=True, required=False)
     username = serializers.CharField(write_only=True)
+    imageB64 = serializers.CharField(write_only=True, required=False)
+    image = ImageSerializer(read_only=True)
 
     class Meta:
         model = OcialClient

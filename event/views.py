@@ -14,6 +14,7 @@ import base64
 from django.core.files.base import ContentFile
 import blurhash
 from PIL import Image
+from images.models import Image as ImageModel
 
 
 # Create your views here.
@@ -107,6 +108,8 @@ class EventCreate(generics.CreateAPIView):
         request.data["ocialClient"] = ocialClient.id
         data = request.data
 
+        image = data.get("imageB64")
+
         eventdata = {
             "name": data.get("name"),
             "place": data.get("place"),
@@ -117,27 +120,27 @@ class EventCreate(generics.CreateAPIView):
             "category": data.get("category"),
             "latitude": data.get("latitude"),
             "longitude": data.get("longitude"),
-            "image": data.get("image"),
-            "blurhash": data.get("blurhash"),
             "ocialClient": data.get("ocialClient"),
         }
         eventform = OcialEventForm(eventdata)
         if eventform.is_valid():
             eventform.save()
-            format, imgstr = data.get("image").split(';base64,')
-            ext = format.split('/')[-1]
-            valid_ext = ['jpg', 'jpeg', 'png']
-            if ext not in valid_ext:
-                return Response(
-                    {"error": "Formato de imagen no válido"},
-                    status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            if image:
+                format, imgstr = data.get("image").split(';base64,')
+                ext = format.split('/')[-1]
+                valid_ext = ['jpg', 'jpeg', 'png']
+                if ext not in valid_ext:
+                    return Response(
+                        {"error": "Formato de imagen no válido"},
+                        status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    )
+                imagefile = ContentFile(base64.b64decode(imgstr), name=f'event-{eventform.instance.id}.{ext}')
+                image = ImageModel.objects.create(
+                    image=imagefile,
+                    blurhash=blurhash.encode(Image.open(imagefile), x_components=4, y_components=3)
                 )
-            ocialClientName = ocialClient.name
-            eventform.instance.image = ContentFile(base64.b64decode(imgstr), name=ocialClientName + '-' + eventform.instance.name + '.' + ext)
-            eventform.instance.save()
-            image = Image.open(eventform.instance.image)
-            eventform.instance.blurhash = blurhash.encode(image, x_components=4, y_components=3)
-            eventform.instance.save()
+                eventform.instance.image = image
+                eventform.instance.save()
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(
@@ -220,7 +223,7 @@ class EventUpdate(APIView):
         ocialClient = ocialClient[0]
         request.data["ocialClient"] = ocialClient.id
         data = request.data
-
+        image = data.get("imageB64")
         eventdata = {
             "name": data.get("name"),
             "place": data.get("place"),
@@ -246,6 +249,22 @@ class EventUpdate(APIView):
             eventUpdate.latitude = data.get("latitude")
             eventUpdate.longitude = data.get("longitude")
             eventUpdate.save()
+            if image:
+                format, imgstr = data.get("image").split(';base64,')
+                ext = format.split('/')[-1]
+                valid_ext = ['jpg', 'jpeg', 'png']
+                if ext not in valid_ext:
+                    return Response(
+                        {"error": "Formato de imagen no válido"},
+                        status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    )
+                imagefile = ContentFile(base64.b64decode(imgstr), name=f'event-{eventUpdate.instance.id}.{ext}')
+                image = ImageModel.objects.create(
+                    image=imagefile,
+                    blurhash=blurhash.encode(Image.open(imagefile), x_components=4, y_components=3)
+                )
+                eventUpdate.instance.image = image
+                eventUpdate.instance.save()
             return Response(status=status.HTTP_200_OK)
         return Response(eventform.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
