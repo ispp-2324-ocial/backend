@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from localflavor.es.models import ESIdentityCardNumberField
 from django.forms import ModelForm
 from ocial.models import *
+from images.models import Image
 
 
 class OcialUser(models.Model):
@@ -31,6 +32,7 @@ class OcialClient(models.Model):
     )
     defaultLatitude = models.FloatField()
     defaultLongitude = models.FloatField()
+    image = models.ForeignKey(Image, related_name="ClientImage", on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name

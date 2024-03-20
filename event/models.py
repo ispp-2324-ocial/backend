@@ -3,6 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from user.models import OcialClient
 from django.forms import ModelForm
 from ocial.models import *
+from images.models import Image
 
 
 # Create your models here.
@@ -22,8 +23,8 @@ class Event(models.Model):
     ocialClient = models.ForeignKey(
         OcialClient, related_name="OcialClient", on_delete=models.CASCADE
     )
-    image = models.ImageField(upload_to="images/", blank=True, null=True)
-    blurhash = models.TextField(blank=True, null=True)
+    image = models.ForeignKey(Image, related_name="EventImage", on_delete=models.CASCADE, null=True, blank=True)
+
 
     def __str__(self):
         return "{}: {} | {}, {}".format(
