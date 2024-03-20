@@ -150,3 +150,4 @@ class TypeClient(Enum):
 class AuthProvider(Enum):
     EMAIL = "email"
     GOOGLE = "google"
+
