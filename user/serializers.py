@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from user.models import OcialClient, OcialUser
+from user.models import OcialClient, OcialUser, Rating
 from django.contrib.auth.models import User
 from . import google
 from django.conf import settings
@@ -85,3 +85,14 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         if user_data["aud"] != settings.GOOGLE_OAUTH2_CLIENT_ID:
             raise serializers.ValidationError("Token is not valid for this app.")
         return user_data
+    
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = "__all__"
+
+
+class RatingCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = "__all__"
