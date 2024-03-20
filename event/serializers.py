@@ -1,18 +1,6 @@
 from rest_framework import serializers
 from images.serializers import ImageSerializer
-from .models import Event, Rating, OcialClient, Like
-
-
-class RatingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Rating
-        fields = "__all__"
-
-
-class RatingCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Rating
-        fields = "__all__"
+from .models import Event, OcialClient, Like
 
 
 class OcialClientSerializer(serializers.ModelSerializer):

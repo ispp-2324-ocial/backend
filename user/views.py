@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
-from rest_framework import status, permissions
+from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import logout
@@ -151,6 +151,16 @@ class LoginUserView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class ClientIDListView(APIView):
+    """
+    Devuelve una lista de todos los ID de los clientes.
+    """
+    def get(self, request, format=None):
+        # Obtener todos los objetos de OcialClient
+        clients = OcialClient.objects.all()
+        # Obtener una lista de los ID de los clientes
+        client_ids = [client.id for client in clients]
+        return Response(client_ids, status=status.HTTP_200_OK)
 
 class LogoutUserView(APIView):
     """
@@ -419,3 +429,64 @@ class GoogleSocialAuthView(APIView):
                         status=status.HTTP_400_BAD_REQUEST,
                     )
             return Response(user_data, status=status.HTTP_200_OK)
+        
+class RatingList(generics.ListAPIView):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
+
+    @extend_schema(
+        description="List of ratings",
+        responses={
+            200: OpenApiResponse(response=RatingSerializer(many=True)),
+            400: OpenApiResponse(response=None, description="Error in request"),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+
+class RatingCreate(generics.CreateAPIView):
+    queryset = Rating.objects.all()
+    serializer_class = RatingCreateSerializer
+
+    @extend_schema(
+        request=RatingCreateSerializer,
+        description="Create a new rating",
+        responses={
+            201: OpenApiResponse(response=RatingSerializer()),
+            400: OpenApiResponse(response=None, description="Error in request"),
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class RatingDelete(generics.DestroyAPIView):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
+
+    @extend_schema(
+        description="Delete a rating",
+        responses={
+            204: OpenApiResponse(description="Rating deleted successfully"),
+            404: OpenApiResponse(response=None, description="Message not found"),
+        },
+    )
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
+
+
+class RatingUpdate(generics.UpdateAPIView):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
+
+    @extend_schema(
+        description="Update an existing rating",
+        responses={
+            200: OpenApiResponse(response=RatingSerializer()),
+            400: OpenApiResponse(response=None, description="Error in request"),
+            404: OpenApiResponse(response=None, description="Rating not found"),
+        },
+    )
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)

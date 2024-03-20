@@ -53,26 +53,6 @@ class Event(models.Model):
             self.ocialClient
 
 
-class Rating(models.Model):
-    score = models.PositiveIntegerField(
-        default=0, validators=[MaxValueValidator(5), MinValueValidator(0)]
-    )
-    comment = models.TextField(blank=True, null=True)
-    event = models.ForeignKey(Event, related_name="Rating", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return "{}: {}".format(self.score, self.comment)
-
-    def save(self, *args, **kwargs):
-        is_new = not self.pk
-        super().save(*args, **kwargs)
-
-        if is_new:
-            self.score
-            self.comment
-            self.event
-
-
 class Like(models.Model):
     event = models.ForeignKey(Event, related_name="Like", on_delete=models.CASCADE)
     user = models.ForeignKey(OcialUser, related_name="Like", on_delete=models.CASCADE)
