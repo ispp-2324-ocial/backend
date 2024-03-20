@@ -1,14 +1,10 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
 
 from . import views
 
-router = DefaultRouter()
-
-router.register("notification", views.NotificationViewSet, basename="notification")
-
 urlpatterns = [
-    path("", views.index,)
+    path("view/", views.index,),
+    path("create/", views.NotificationCreate.as_view(), name="notification"),
+    path("<int:pk>/update/", views.NotificationUpdate.as_view(), name="notification_update"),
+    path("<int:pk>/delete/", views.NotificationDelete.as_view(), name="notification_delete"),
 ]
-
-urlpatterns += router.urls
