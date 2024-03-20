@@ -67,14 +67,15 @@ class OcialUserTestCase(TestCase):
             "lastKnowLocLong": -40.7128,
         }
         self.client_data = {
-            "username": "testclient",
-            "password": "testpassword",
-            "email": "client@example.com",
-            "name": "Test Client",
-            "identification_document": "09981078K",
-            "typeClient": TypeClient.SMALL_BUSINESS.value,
-            "default_latitude": 40.7128,
-            "default_longitude": -40.7128,
+        "password": "asjrfkuyllyllyly.1213",
+        "email": "user@example.com",
+        "username": "testclient",
+        "name": "string",
+        "identificationDocument": "81616045Q",
+        "typeClient": "Small business",
+        "defaultLatitude": 0,
+        "defaultLongitude": 0,
+        "djangoUser": 0
         }
 
     def testGetUsers(self):
@@ -89,12 +90,12 @@ class OcialUserTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(User.objects.filter(username="testuser").exists())
 
-    # def testCreateClient(self):
-    #     response = self.client.post(
-    #         "/api/users/client/register/", self.client_data, format="json"
-    #     )
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertTrue(User.objects.filter(username="testclient").exists())
+    def testCreateClient(self):
+        response = self.client.post(
+            "/api/users/client/register/", self.client_data, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(User.objects.filter(username="testclient").exists())
 
     def testLoginUser(self):
         User.objects.create_user(
