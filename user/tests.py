@@ -8,6 +8,7 @@ from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
 from django.urls import reverse
 
+
 class OcialUserTestCase(TestCase):
     def setUp(self):
         self.user_1 = User.objects.create_user(
@@ -67,21 +68,21 @@ class OcialUserTestCase(TestCase):
             "lastKnowLocLong": -40.7128,
         }
         self.client_data = {
-        "password": "asjrfkuyllyllyly.1213",
-        "email": "user@example.com",
-        "username": "testclient",
-        "name": "string",
-        "identificationDocument": "81616045Q",
-        "typeClient": "Small business",
-        "defaultLatitude": 0,
-        "defaultLongitude": 0,
-        "djangoUser": 0
+            "password": "asjrfkuyllyllyly.1213",
+            "email": "user@example.com",
+            "username": "testclient",
+            "name": "string",
+            "identificationDocument": "81616045Q",
+            "typeClient": "Small business",
+            "defaultLatitude": 0,
+            "defaultLongitude": 0,
+            "djangoUser": 0,
         }
 
     def testGetUsers(self):
         self.list2 = [self.user1, self.user2, self.user3, self.user4]
         self.assertEqual(self.list1, self.list2)
-        self.assertEqual(self.user4.typeClient,TypeClient.SMALL_BUSINESS.value)
+        self.assertEqual(self.user4.typeClient, TypeClient.SMALL_BUSINESS.value)
 
     def testCreateUser(self):
         response = self.client.post(
