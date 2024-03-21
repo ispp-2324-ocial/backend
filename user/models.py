@@ -42,7 +42,13 @@ class OcialClient(models.Model):
     )
     defaultLatitude = models.FloatField()
     defaultLongitude = models.FloatField()
-    image = models.ForeignKey(Image, related_name="ClientImage", on_delete=models.CASCADE, null=True, blank=True)
+    image = models.ForeignKey(
+        Image,
+        related_name="ClientImage",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.name

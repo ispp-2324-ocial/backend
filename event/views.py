@@ -3,7 +3,6 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.openapi import OpenApiResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 from .serializers import *
 from django.db.models.functions import ACos, Cos, Radians, Sin
 from django.db.models import F
@@ -126,18 +125,23 @@ class EventCreate(generics.CreateAPIView):
         if eventform.is_valid():
             eventform.save()
             if image:
-                format, imgstr = data.get("image").split(';base64,')
-                ext = format.split('/')[-1]
-                valid_ext = ['jpg', 'jpeg', 'png']
+                format, imgstr = data.get("image").split(";base64,")
+                ext = format.split("/")[-1]
+                valid_ext = ["jpg", "jpeg", "png"]
                 if ext not in valid_ext:
                     return Response(
                         {"error": "Formato de imagen no válido"},
                         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     )
-                imagefile = ContentFile(base64.b64decode(imgstr), name=f'event-{eventform.instance.id}.{ext}')
+                imagefile = ContentFile(
+                    base64.b64decode(imgstr),
+                    name=f"event-{eventform.instance.id}.{ext}",
+                )
                 image = ImageModel.objects.create(
                     image=imagefile,
-                    blurhash=blurhash.encode(Image.open(imagefile), x_components=4, y_components=3)
+                    blurhash=blurhash.encode(
+                        Image.open(imagefile), x_components=4, y_components=3
+                    ),
                 )
                 eventform.instance.image = image
                 eventform.instance.save()
@@ -250,18 +254,23 @@ class EventUpdate(APIView):
             eventUpdate.longitude = data.get("longitude")
             eventUpdate.save()
             if image:
-                format, imgstr = data.get("image").split(';base64,')
-                ext = format.split('/')[-1]
-                valid_ext = ['jpg', 'jpeg', 'png']
+                format, imgstr = data.get("image").split(";base64,")
+                ext = format.split("/")[-1]
+                valid_ext = ["jpg", "jpeg", "png"]
                 if ext not in valid_ext:
                     return Response(
                         {"error": "Formato de imagen no válido"},
                         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     )
-                imagefile = ContentFile(base64.b64decode(imgstr), name=f'event-{eventUpdate.instance.id}.{ext}')
+                imagefile = ContentFile(
+                    base64.b64decode(imgstr),
+                    name=f"event-{eventUpdate.instance.id}.{ext}",
+                )
                 image = ImageModel.objects.create(
                     image=imagefile,
-                    blurhash=blurhash.encode(Image.open(imagefile), x_components=4, y_components=3)
+                    blurhash=blurhash.encode(
+                        Image.open(imagefile), x_components=4, y_components=3
+                    ),
                 )
                 eventUpdate.instance.image = image
                 eventUpdate.instance.save()
