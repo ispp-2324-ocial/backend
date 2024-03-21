@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Event, Rating, OcialClient
 from images.serializers import ImageSerializer
 
+
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
@@ -25,6 +26,7 @@ class EventSerializer(serializers.ModelSerializer):
     ocialClient = OcialClientSerializer()
     imageB64 = serializers.CharField(write_only=True, required=False)
     image = ImageSerializer(read_only=True)
+
     class Meta:
         model = Event
         fields = "__all__"
