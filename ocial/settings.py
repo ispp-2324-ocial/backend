@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "chat",
     "drf_spectacular",
     "rest_framework.authtoken",
+    "payments",
 ]
 
 STATIC_URL = "/static/"
@@ -96,7 +97,7 @@ ROOT_URLCONF = "ocial.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": ['templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -170,3 +171,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 GOOGLE_OAUTH2_CLIENT_ID = os.environ.get("GOOGLE_OAUTH2_CLIENT_ID")
 GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH2_CLIENT_SECRET")
 GOOGLE_OAUTH2_PROJECT_ID = os.environ.get("GOOGLE_OAUTH2_PROJECT_ID")
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
