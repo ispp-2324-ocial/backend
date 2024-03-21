@@ -7,16 +7,15 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Image',
+            name="Image",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('image', models.ImageField(upload_to='media/')),
-                ('blurhash', models.TextField()),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("image", models.ImageField(upload_to="media/")),
+                ("blurhash", models.TextField()),
             ],
         ),
     ]

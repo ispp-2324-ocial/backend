@@ -23,8 +23,13 @@ class Event(models.Model):
     ocialClient = models.ForeignKey(
         OcialClient, related_name="OcialClient", on_delete=models.CASCADE
     )
-    image = models.ForeignKey(Image, related_name="EventImage", on_delete=models.CASCADE, null=True, blank=True)
-
+    image = models.ForeignKey(
+        Image,
+        related_name="EventImage",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return "{}: {} | {}, {}".format(
