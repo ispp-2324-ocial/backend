@@ -21,7 +21,7 @@ class Subscription(models.Model):
     )
 
     def __str__(self):
-        return f"{self.get_typeSubscription_display()} Subscription"
+        return "{}: {}, {}: {}".format("Subscription", self.typeSubscription, "OcialClient", self.ocialClientId.id)
 
     def save(self, *args, **kwargs):
         is_new = not self.pk
