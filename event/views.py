@@ -7,17 +7,17 @@ from .serializers import *
 from django.db.models.functions import ACos, Cos, Radians, Sin
 from django.db.models import F
 from django.contrib.auth.models import User
-from user.models import OcialClient
-from .models import OcialEventForm
 import base64
 from django.core.files.base import ContentFile
 import blurhash
 from PIL import Image
 from images.models import Image as ImageModel
+from user.models import OcialClient, OcialUser
+from .models import OcialEventForm, Like, Event
+from rest_framework.authtoken.models import Token
 
 
 # Create your views here.
-from .models import Event, Rating, OcialClient
 
 
 class EventClientGet(APIView):
@@ -412,3 +412,81 @@ class EventNearby(generics.ListAPIView):
 
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
+
+class EventLike(APIView):
+    @extend_schema(
+        description="Get likes of an event",
+        responses={
+            200: OpenApiResponse(response=LikeSerializer(many=True), description="List of likes"),
+            404: OpenApiResponse(response=None, description="Event not found"),
+        },
+    )
+
+    def get(self, request, *args, **kwargs):
+        try:
+            event = Event.objects.get(pk=kwargs["pk"])
+        except Event.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        likes = Like.objects.filter(event=event)
+        serializer = LikeSerializer(likes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        description="Like an event",
+        responses={
+            201: OpenApiResponse(response=LikeSerializer, description="Event liked"),
+            404: OpenApiResponse(response=None, description="Event not found"),
+            401: OpenApiResponse(response=None, description="Not authenticated"),
+            400: OpenApiResponse(response=None, description="Already liked event"),
+        },
+    )
+
+    def post(self, request, *args, **kwargs):
+        try:
+            event = Event.objects.get(pk=kwargs["pk"])
+        except Event.DoesNotExist:
+            return Response({"error": "El evento no existe."}, status=status.HTTP_404_NOT_FOUND)
+        token = request.headers.get("Authorization")
+        if not token:
+            return Response({"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED)
+        token = token.split(" ")[1]
+        user = Token.objects.get(key=token).user
+        user = OcialUser.objects.get(djangoUser=user)
+        if not user:
+            return Response({"error": "No puedes dar like al evento."}, status=status.HTTP_401_UNAUTHORIZED)
+        like_exist = Like.objects.filter(event=event, user=user)
+        if like_exist:
+            return Response({"error": "Ya has dado like a este evento."}, status=status.HTTP_400_BAD_REQUEST)
+        like = Like.objects.create(event=event, user=user)
+        like.save()
+        serializer = LikeSerializer(like)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        description="Unlike an event",
+        responses={
+            204: OpenApiResponse(response=None, description="Event unliked"),
+            404: OpenApiResponse(response=None, description="Event not found"),
+            401: OpenApiResponse(response=None, description="Not authenticated"),
+            400: OpenApiResponse(response=None, description="Not liked event"),
+        },
+    )
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            event = Event.objects.get(pk=kwargs["pk"])
+        except Event.DoesNotExist:
+            return Response({"error": "El evento no existe."}, status=status.HTTP_404_NOT_FOUND)
+        token = request.headers.get("Authorization")
+        if not token:
+            return Response({"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED)
+        token = token.split(" ")[1]
+        user = Token.objects.get(key=token).user
+        user = OcialUser.objects.get(djangoUser=user)
+        if not user:
+            return Response({"error": "No puedes dar like al evento."}, status=status.HTTP_401_UNAUTHORIZED)
+        like = Like.objects.filter(event=event, user=user)
+        if not like:
+            return Response({"error": "No has dado like a este evento."}, status=status.HTTP_400_BAD_REQUEST)
+        like.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
