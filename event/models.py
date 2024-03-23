@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-from user.models import OcialClient
+from user.models import OcialClient, OcialUser
 from django.forms import ModelForm
 from ocial.models import *
 from images.models import Image
@@ -71,6 +71,22 @@ class Rating(models.Model):
             self.score
             self.comment
             self.event
+
+
+class Like(models.Model):
+    event = models.ForeignKey(Event, related_name="Like", on_delete=models.CASCADE)
+    user = models.ForeignKey(OcialUser, related_name="Like", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "{}: {}".format(self.event, self.user)
+
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        super().save(*args, **kwargs)
+
+        if is_new:
+            self.event
+            self.user
 
 
 class OcialEventForm(ModelForm):

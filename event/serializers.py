@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Event, Rating, OcialClient
 from images.serializers import ImageSerializer
+from .models import Event, Rating, OcialClient, Like
 
 
 class RatingSerializer(serializers.ModelSerializer):
@@ -36,3 +36,9 @@ class EventNearbySerializer(serializers.Serializer):
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
     radius = serializers.FloatField()
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = "__all__"
