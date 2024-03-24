@@ -15,7 +15,7 @@ from images.models import Image as ImageModel
 from user.models import OcialClient, OcialUser
 from .models import OcialEventForm, Like, Event
 from rest_framework.authtoken.models import Token
-
+from datetime import datetime, timedelta
 
 # Create your views here.
 
@@ -103,8 +103,15 @@ class EventCreate(generics.CreateAPIView):
         },
     )
     def post(self, request, *args, **kwargs):
+<<<<<<< HEAD
         token = request.headers.get("Authorization")
         if not token:
+=======
+        
+        start = datetime.strptime(request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ")
+        end = datetime.strptime(request.data.get("timeEnd"), "%Y-%m-%dT%H:%M:%S.%fZ")
+        if not User.objects.filter(id=request.user.id).exists():
+>>>>>>> 1115c54 (fix(event): solucion a las validaciones de las fechas)
             return Response(
                 {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
             )
@@ -116,6 +123,19 @@ class EventCreate(generics.CreateAPIView):
             return Response(
                 {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
             )
+<<<<<<< HEAD
+=======
+        
+        if start > end:
+            return Response({"error": "El evento debe empezar antes de acabar"},status=status.HTTP_400_BAD_REQUEST,)
+
+        if start < datetime.now() or end < datetime.now():
+            return Response({"error": "El evento debe empezar y acabar siempre en una fecha futura"},status=status.HTTP_400_BAD_REQUEST,)
+        
+        if end - start > timedelta(days=1):
+            return Response({"error": "Un evento no puede durar mas de un dia"},status=status.HTTP_400_BAD_REQUEST,)
+
+>>>>>>> 1115c54 (fix(event): solucion a las validaciones de las fechas)
         request.data.pop("ocialClient")
         if not ocialClient:
             return Response(
@@ -255,11 +275,19 @@ class EventUpdate(APIView):
         },
     )
     def put(self, request, *args, **kwargs):
+<<<<<<< HEAD
         token = request.headers.get("Authorization")
         if not token:
+=======
+        start = datetime.strptime(request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ")
+        end = datetime.strptime(request.data.get("timeEnd"), "%Y-%m-%dT%H:%M:%S.%fZ")
+        
+        if not User.objects.filter(id=request.user.id).exists():
+>>>>>>> 1115c54 (fix(event): solucion a las validaciones de las fechas)
             return Response(
                 {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
             )
+<<<<<<< HEAD
         token = token.split(" ")[1]
         user = Token.objects.get(key=token).user
         try:
@@ -275,6 +303,22 @@ class EventUpdate(APIView):
                 {"error": "No existe el evento"}, status=status.HTTP_404_NOT_FOUND
             )
         if not (ocialClient.id == eventAct.ocialClient.id):
+=======
+            
+        if start > end:
+            return Response({"error": "El evento debe empezar antes de acabar"},status=status.HTTP_400_BAD_REQUEST,)
+
+        if start < datetime.now() or end < datetime.now():
+            return Response({"error": "El evento debe empezar y acabar siempre en una fecha futura"},status=status.HTTP_400_BAD_REQUEST,)
+        
+        if end - start > timedelta(days=1):
+            return Response({"error": "Un evento no puede durar mas de un dia"},status=status.HTTP_400_BAD_REQUEST,)
+        
+        request.data.pop("ocialClient")
+        ocialClient = OcialClient.objects.filter(djangoUser=request.user)
+        eventAct = Event.objects.filter(id=kwargs["pk"])
+        if not (ocialClient[0].id == eventAct[0].ocialClient.id):
+>>>>>>> 1115c54 (fix(event): solucion a las validaciones de las fechas)
             return Response(
                 {"error": "No puedes actualizar datos de un evento de otro cliente"},
                 status=status.HTTP_403_FORBIDDEN,
