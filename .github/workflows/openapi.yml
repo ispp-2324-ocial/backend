@@ -64,3 +64,13 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "ci: update openapi.yaml"
+
+      - name: Trigger generation workflow in axios-apiclient
+        if: ${{ steps.diff.outputs.count > 0 && github.event_name == 'push' }}
+        uses: convictional/trigger-workflow-and-wait@v1.6.5
+        with:
+          owner: ispp-2324-ocial
+          repo: axios-apiclient
+          github_token: ${{ secrets.GH_TOKEN }}
+          workflow_file_name: generation.yml
+          wait_workflow: false
