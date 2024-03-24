@@ -413,7 +413,10 @@ class EventNearby(generics.ListAPIView):
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
-class EventLike(APIView):
+
+class EventLike(generics.ListAPIView):
+    serializer_class = LikeSerializer
+
     @extend_schema(
         description="Get likes of an event",
         responses={
