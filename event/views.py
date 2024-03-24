@@ -25,11 +25,17 @@ class EventClientGet(APIView):
         description="Get client instance by event id",
         responses={
             200: OpenApiResponse(response=OcialClientSerializer(many=True)),
+            404: OpenApiResponse(response=None, description="Event not found"),
             400: OpenApiResponse(response=None, description="Error in request"),
         },
     )
     def get(self, request, *args, **kwargs):
-        event = Event.objects.get(pk=kwargs["pk"])
+        try:
+            event = Event.objects.get(pk=kwargs["pk"])
+        except Event.DoesNotExist:
+            return Response(
+                {"error": "No existe el evento"}, status=status.HTTP_404_NOT_FOUND
+            )
         oc = OcialClient.objects.get(pk=event.ocialClient.pk)
         return Response(OcialClientSerializer(oc).data, status=status.HTTP_200_OK)
 
@@ -66,12 +72,15 @@ class EventListByClient(generics.ListAPIView):
             )
 
         # Get list of events if client has events, otherwise []
-        ocialClient = OcialClient.objects.filter(pk=kwargs["pk"])
-        if ocialClient:
-            events = Event.objects.filter(ocialClient=ocialClient[0].id)
-            serialized_events = [EventSerializer(event).data for event in events]
-            return Response(serialized_events, status=status.HTTP_200_OK)
-        return Response([], status=status.HTTP_200_OK)
+        try:
+            ocialClient = OcialClient.objects.filter(pk=kwargs["pk"])
+        except OcialClient.DoesNotExist:
+            return Response(
+                {"error": "No existe el cliente"}, status=status.HTTP_404_NOT_FOUND
+            )
+        events = Event.objects.filter(ocialClient=ocialClient[0])
+        serialized_events = [EventSerializer(event).data for event in events]
+        return Response(serialized_events, status=status.HTTP_200_OK)
 
 
 class EventCreate(generics.CreateAPIView):
@@ -92,18 +101,20 @@ class EventCreate(generics.CreateAPIView):
         },
     )
     def post(self, request, *args, **kwargs):
-        if not User.objects.filter(id=request.user.id).exists():
+        token = request.headers.get("Authorization")
+        if not token:
             return Response(
-                {"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
             )
-
+        token = token.split(" ")[1]
+        user = Token.objects.get(key=token).user
+        print(user)
+        ocialClient = OcialClient.objects.get(djangoUser=user)
         request.data.pop("ocialClient")
-        ocialClient = OcialClient.objects.filter(djangoUser=request.user)
         if not ocialClient:
             return Response(
                 {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
             )
-        ocialClient = ocialClient[0]
         request.data["ocialClient"] = ocialClient.id
         data = request.data
 
@@ -125,7 +136,15 @@ class EventCreate(generics.CreateAPIView):
         if eventform.is_valid():
             eventform.save()
             if image:
-                format, imgstr = data.get("image").split(";base64,")
+                try:
+                    image_data = base64.b64decode(image, validate=True)
+                except Exception:
+                    eventform.instance.delete()
+                    return Response(
+                        {"error": "Formato de imagen no válido"},
+                        status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    )
+                format, imgstr = image.split(";base64,")
                 ext = format.split("/")[-1]
                 valid_ext = ["jpg", "jpeg", "png"]
                 if ext not in valid_ext:
@@ -169,17 +188,26 @@ class EventDelete(generics.DestroyAPIView):
         },
     )
     def delete(self, request, *args, **kwargs):
-
-        if not User.objects.filter(id=request.user.id).exists():
+        token = request.headers.get("Authorization")
+        if not token:
             return Response(
-                {"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
             )
-
-        ocialClient = OcialClient.objects.filter(djangoUser=request.user)
-        eventAct = Event.objects.filter(id=kwargs["pk"])
-        if not (ocialClient[0].id == eventAct[0].ocialClient.id):
+        token = token.split(" ")[1]
+        user = Token.objects.get(key=token).user
+        ocialClient = OcialClient.objects.get(djangoUser=user)
+        if not ocialClient:
             return Response(
                 {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
+            )
+        eventAct = Event.objects.filter(id=kwargs["pk"])
+        if not eventAct.exists():
+            return Response(
+                {"error": "No existe el evento"}, status=status.HTTP_404_NOT_FOUND
+            )
+        if not (ocialClient.id == eventAct[0].ocialClient.id):
+            return Response(
+                {"error": "No puedes borrar el evento de otra persona"}, status=status.HTTP_403_FORBIDDEN
             )
 
         if eventAct.exists():
@@ -211,20 +239,30 @@ class EventUpdate(APIView):
         },
     )
     def put(self, request, *args, **kwargs):
-        if not User.objects.filter(id=request.user.id).exists():
+        token = request.headers.get("Authorization")
+        if not token:
             return Response(
-                {"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
             )
-
-        request.data.pop("ocialClient")
-        ocialClient = OcialClient.objects.filter(djangoUser=request.user)
-        eventAct = Event.objects.filter(id=kwargs["pk"])
-        if not (ocialClient[0].id == eventAct[0].ocialClient.id):
+        token = token.split(" ")[1]
+        user = Token.objects.get(key=token).user
+        ocialClient = OcialClient.objects.get(djangoUser=user)
+        if not ocialClient:
+            return Response(
+                {"error": "No puedes ed."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        try:
+            eventAct = Event.objects.get(id=kwargs["pk"])
+        except Event.DoesNotExist:
+            return Response(
+                {"error": "No existe el evento"}, status=status.HTTP_404_NOT_FOUND
+            )
+        if not (ocialClient.id == eventAct.ocialClient.id):
             return Response(
                 {"error": "No puedes actualizar datos de un evento de otro cliente"},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        ocialClient = ocialClient[0]
         request.data["ocialClient"] = ocialClient.id
         data = request.data
         image = data.get("imageB64")
@@ -254,6 +292,14 @@ class EventUpdate(APIView):
             eventUpdate.longitude = data.get("longitude")
             eventUpdate.save()
             if image:
+                try:
+                    image_data = base64.b64decode(image, validate=True)
+                except Exception:
+                    eventform.instance.delete()
+                    return Response(
+                        {"error": "Formato de imagen no válido"},
+                        status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    )
                 format, imgstr = data.get("image").split(";base64,")
                 ext = format.split("/")[-1]
                 valid_ext = ["jpg", "jpeg", "png"]
