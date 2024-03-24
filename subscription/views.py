@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.openapi import OpenApiResponse
 from .models import Subscription
-from .serializers import SubscriptionSerializer
+from .serializers import *
 from django.contrib.auth.models import User
 from user.models import OcialClient
 from rest_framework.permissions import IsAuthenticated
@@ -52,7 +52,7 @@ class SubscriptionCreate(generics.CreateAPIView):
 
     @extend_schema(
         description="Create a new subscription with specific behavior based on subscription type.",
-        request=SubscriptionSerializer,
+        request=SubscriptionCreateUpdateSerializer,
         responses={
             201: OpenApiResponse(response=SubscriptionSerializer),
             400: OpenApiResponse(response=None, description="Bad Request"),
@@ -154,10 +154,9 @@ class SubscriptionDelete(generics.DestroyAPIView):
 
 class SubscriptionUpdate(generics.UpdateAPIView):
     permission_classes = [permissions.AllowAny]
-    serializer_class = SubscriptionSerializer
 
     @extend_schema(
-        request=SubscriptionSerializer,
+        request=SubscriptionCreateUpdateSerializer,
         description="Update an subscription",
         responses={
             201: OpenApiResponse(response=None),
