@@ -420,11 +420,12 @@ class EventLike(generics.ListAPIView):
     @extend_schema(
         description="Get likes of an event",
         responses={
-            200: OpenApiResponse(response=LikeSerializer(many=True), description="List of likes"),
+            200: OpenApiResponse(
+                response=LikeSerializer(many=True), description="List of likes"
+            ),
             404: OpenApiResponse(response=None, description="Event not found"),
         },
     )
-
     def get(self, request, *args, **kwargs):
         try:
             event = Event.objects.get(pk=kwargs["pk"])
@@ -443,23 +444,32 @@ class EventLike(generics.ListAPIView):
             400: OpenApiResponse(response=None, description="Already liked event"),
         },
     )
-
     def post(self, request, *args, **kwargs):
         try:
             event = Event.objects.get(pk=kwargs["pk"])
         except Event.DoesNotExist:
-            return Response({"error": "El evento no existe."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "El evento no existe."}, status=status.HTTP_404_NOT_FOUND
+            )
         token = request.headers.get("Authorization")
         if not token:
-            return Response({"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
+            )
         token = token.split(" ")[1]
         user = Token.objects.get(key=token).user
         user = OcialUser.objects.get(djangoUser=user)
         if not user:
-            return Response({"error": "No puedes dar like al evento."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "No puedes dar like al evento."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
         like_exist = Like.objects.filter(event=event, user=user)
         if like_exist:
-            return Response({"error": "Ya has dado like a este evento."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Ya has dado like a este evento."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         like = Like.objects.create(event=event, user=user)
         like.save()
         serializer = LikeSerializer(like)
@@ -474,22 +484,31 @@ class EventLike(generics.ListAPIView):
             400: OpenApiResponse(response=None, description="Not liked event"),
         },
     )
-
     def delete(self, request, *args, **kwargs):
         try:
             event = Event.objects.get(pk=kwargs["pk"])
         except Event.DoesNotExist:
-            return Response({"error": "El evento no existe."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "El evento no existe."}, status=status.HTTP_404_NOT_FOUND
+            )
         token = request.headers.get("Authorization")
         if not token:
-            return Response({"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
+            )
         token = token.split(" ")[1]
         user = Token.objects.get(key=token).user
         user = OcialUser.objects.get(djangoUser=user)
         if not user:
-            return Response({"error": "No puedes dar like al evento."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "No puedes dar like al evento."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
         like = Like.objects.filter(event=event, user=user)
         if not like:
-            return Response({"error": "No has dado like a este evento."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "No has dado like a este evento."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         like.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

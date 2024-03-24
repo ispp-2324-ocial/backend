@@ -9,25 +9,39 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('images', '0002_alter_image_image'),
-        ('user', '0001_initial'),
-        ('event', '0001_initial'),
+        ("images", "0002_alter_image_image"),
+        ("user", "0001_initial"),
+        ("event", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='like',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='Like', to='user.ocialuser'),
+            model_name="like",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="Like",
+                to="user.ocialuser",
+            ),
         ),
         migrations.AddField(
-            model_name='event',
-            name='image',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='EventImage', to='images.image'),
+            model_name="event",
+            name="image",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="EventImage",
+                to="images.image",
+            ),
         ),
         migrations.AddField(
-            model_name='event',
-            name='ocialClient',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='OcialClient', to='user.ocialclient'),
+            model_name="event",
+            name="ocialClient",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="OcialClient",
+                to="user.ocialclient",
+            ),
         ),
     ]
