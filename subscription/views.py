@@ -73,6 +73,12 @@ class SubscriptionCreate(generics.CreateAPIView):
         request.data["ocialClientId"] = ocialClient
         data = request.data
 
+        existsubscription = Subscription.objects.filter(ocialClientId=ocialClient.id)
+        if existsubscription:
+            return Response(
+                {"error": "Este cliente ya tiene una suscripcion"}, status=status.HTTP_403_FORBIDDEN
+            )
+
         subscription_data = {}
         if type_subscription == 'Free':
             subscription_data = {
