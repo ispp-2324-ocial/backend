@@ -95,4 +95,4 @@ class RatingSerializer(serializers.ModelSerializer):
 class RatingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
-        fields = "__all__"
+        fields = ("score", "comment")

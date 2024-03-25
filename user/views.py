@@ -87,9 +87,6 @@ class RegisterUserView(APIView):
 
 
 class LoginUserView(APIView):
-    """
-    Inicia la sesión del usuario y devuelve el token de autenticación
-    """
 
     permission_classes = [permissions.AllowAny]
 
@@ -131,7 +128,6 @@ class LoginUserView(APIView):
                 else:
                     isClient = False
                     client = None
-                # Inicia sesión al usuario autenticado
                 login(request, user)
                 userdata = DjangoUserSerializer(user).data
                 userdata.pop("password")
@@ -146,27 +142,11 @@ class LoginUserView(APIView):
                     status=status.HTTP_200_OK,
                 )
             else:
-                # La contraseña es incorrecta o no existe el usuario
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ClientIDListView(APIView):
-    """
-    Devuelve una lista de todos los ID de los clientes.
-    """
-    def get(self, request, format=None):
-        # Obtener todos los objetos de OcialClient
-        clients = OcialClient.objects.all()
-        # Obtener una lista de los ID de los clientes
-        client_ids = [client.id for client in clients]
-        return Response(client_ids, status=status.HTTP_200_OK)
-
 class LogoutUserView(APIView):
-    """
-    Cierra la sesión del usuario
-    """
-
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -445,23 +425,73 @@ class RatingList(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
 
-class RatingCreate(generics.CreateAPIView):
+class RatingCreate(APIView):
+    permission_classes = [IsAuthenticated]
     queryset = Rating.objects.all()
     serializer_class = RatingCreateSerializer
 
     @extend_schema(
-        request=RatingCreateSerializer,
-        description="Create a new rating",
+        description="Create a rating",
         responses={
-            201: OpenApiResponse(response=RatingSerializer()),
+            200: OpenApiResponse(response=RatingCreateSerializer()),
             400: OpenApiResponse(response=None, description="Error in request"),
+            404: OpenApiResponse(response=None, description="Rating not found"),
         },
     )
     def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+        user = request.user
+        # Verify if ocialuser
+        try:
+            ocial_user = user.ocialuser
+        except OcialUser.DoesNotExist:
+            return Response({"error": "Solo los usuarios OcialUser pueden crear un rating."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        client = OcialClient.objects.filter(id=kwargs["pk"])
+        if not client:
+            return Response({"error": "No existe ese cliente."},
+                            status=status.HTTP_404_NOT_FOUND)
+        
+        existing_rating = Rating.objects.filter(client_id=client[0].id, user=ocial_user.djangoUser).exists()
+        if existing_rating:
+            return Response({"error": "Ya has dado tu opinión sobre este cliente."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify Score
+        score = request.data.get('score')
+
+        if score > 5:
+            score = 5
+        
+        if score < 0:
+            score = 0
+        
+        # Create rating if all is Ok
+        serializer = RatingCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=ocial_user.djangoUser, client = client[0])
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class RatingIDClientListView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = RatingSerializer
+    
+    def get(self, request, *args,**kwargs):
+        
+        client = OcialClient.objects.filter(id=kwargs["pk"])
+        if not client:
+            return Response({"error": "No existe ese cliente."},
+                            status=status.HTTP_404_NOT_FOUND)
+        ratings = Rating.objects.filter(client_id=client[0].id)
+        
+        serializer = RatingSerializer(ratings, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RatingDelete(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
 
@@ -473,20 +503,67 @@ class RatingDelete(generics.DestroyAPIView):
         },
     )
     def delete(self, request, *args, **kwargs):
-        return super().delete(request, *args, **kwargs)
-
+        user = request.user
+            
+        # Verificar si el usuario es un OcialUser
+        try:
+            ocial_user = user.ocialuser
+        except OcialUser.DoesNotExist:
+            return Response({"error": "No eres un OcialUser."},
+                            status=status.HTTP_403_FORBIDDEN)
+        
+        client = OcialClient.objects.filter(id=kwargs["pk"]).first()
+        if not client:
+            return Response({"error": "No existe ese cliente."},
+                            status=status.HTTP_404_NOT_FOUND)
+        
+        existing_rating = Rating.objects.filter(client=client, user=ocial_user.djangoUser).first()
+        if not existing_rating:
+            return Response({"error": "El cliente no tiene un rating tuyo."},
+                            status=status.HTTP_400_BAD_REQUEST)
+                
+        # Eliminar el rating
+        existing_rating.delete()
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class RatingUpdate(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Rating.objects.all()
-    serializer_class = RatingSerializer
+    serializer_class = RatingCreateSerializer
 
     @extend_schema(
         description="Update an existing rating",
         responses={
-            200: OpenApiResponse(response=RatingSerializer()),
+            200: OpenApiResponse(response=RatingCreateSerializer()),
             400: OpenApiResponse(response=None, description="Error in request"),
             404: OpenApiResponse(response=None, description="Rating not found"),
         },
     )
     def put(self, request, *args, **kwargs):
-        return super().put(request, *args, **kwargs)
+        user = request.user
+        
+        # Verificar si el usuario es un OcialUser
+        try:
+            ocial_user = user.ocialuser
+        except OcialUser.DoesNotExist:
+            return Response({"error": "No eres un OcialUser."},
+                            status=status.HTTP_403_FORBIDDEN)
+        
+        client = OcialClient.objects.filter(id=kwargs["pk"]).first()
+        if not client:
+            return Response({"error": "No existe ese cliente."},
+                            status=status.HTTP_404_NOT_FOUND)
+        
+        existing_rating = Rating.objects.filter(client=client, user=ocial_user.djangoUser).first()
+        if not existing_rating:
+            return Response({"error": "El cliente no tiene un rating tuyo."},
+                            status=status.HTTP_400_BAD_REQUEST)
+                
+        # Serializando los datos de la solicitud y actualizando el objeto Rating
+        serializer = self.get_serializer(existing_rating, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

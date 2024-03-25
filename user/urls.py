@@ -13,7 +13,8 @@ urlpatterns = [
     path(
         "user/google-oauth2/", views.GoogleSocialAuthView.as_view(), name="google_auth"
     ),
-    path('rating/', views.RatingCreate.as_view(), name='rating_create'),
-    path("rating/<int:pk>/", views.RatingDelete.as_view(), name="rating_delete"),
-    path('ocialclients', views.ClientIDListView.as_view(), name='get_ocialclients'),
+    path('rating/<int:pk>/', views.RatingCreate.as_view(), name='rating_create'),
+    path("rating/<int:pk>/delete", views.RatingDelete.as_view(), name="rating_delete"),
+    path('ratings/by-client/<int:pk>/', views.RatingIDClientListView.as_view(), name='ratings_by_client'),
+    path("rating/<int:pk>/update", views.RatingUpdate.as_view(), name="rating_update"),
 ]
