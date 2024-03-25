@@ -62,13 +62,14 @@ class EventListByClient(generics.ListAPIView):
         description="List of events by client id",
         responses={
             200: OpenApiResponse(response=EventSerializer(many=True)),
-            400: OpenApiResponse(response=None, description="No estás logueado"),
+            401: OpenApiResponse(response=None, description="No estás logueado"),
+            404: OpenApiResponse(response=None, description="No existe el cliente"),
         },
     )
     def get(self, request, *args, **kwargs):
         if not User.objects.filter(id=request.user.id).exists():
             return Response(
-                {"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "No estás logueado"}, status=status.HTTP_401_UNAUTHORIZED
             )
 
         # Get list of events if client has events, otherwise []
@@ -91,12 +92,13 @@ class EventCreate(generics.CreateAPIView):
         description="Create a new event",
         responses={
             201: OpenApiResponse(response=None, description="El evento se ha creado"),
+            401: OpenApiResponse(response=None, description="No estás logueado"),
             400: OpenApiResponse(
-                response=None, description="El usuario no ha iniciado sesión"
+                response=None, description="El formulario contiene errores"
             ),
             403: OpenApiResponse(response=None, description="El usuario no es cliente"),
             422: OpenApiResponse(
-                response=None, description="El formulario contiene errores"
+                response=None, description="La imagen no tiene un formato válido"
             ),
         },
     )
@@ -108,7 +110,6 @@ class EventCreate(generics.CreateAPIView):
             )
         token = token.split(" ")[1]
         user = Token.objects.get(key=token).user
-        print(user)
         ocialClient = OcialClient.objects.get(djangoUser=user)
         request.data.pop("ocialClient")
         if not ocialClient:
@@ -168,7 +169,7 @@ class EventCreate(generics.CreateAPIView):
         else:
             return Response(
                 {"errors": eventform.errors},
-                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
 
@@ -180,6 +181,7 @@ class EventDelete(generics.DestroyAPIView):
             204: OpenApiResponse(
                 response=None, description="El evento se ha eliminado"
             ),
+            401: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
             400: OpenApiResponse(
                 response=None, description="El usuario no ha iniciado sesión"
             ),
@@ -227,6 +229,7 @@ class EventUpdate(APIView):
             200: OpenApiResponse(
                 response=None, description="El evento se ha actualizado"
             ),
+            401: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
             400: OpenApiResponse(
                 response=None, description="El usuario no ha iniciado sesión"
             ),
@@ -249,8 +252,8 @@ class EventUpdate(APIView):
         ocialClient = OcialClient.objects.get(djangoUser=user)
         if not ocialClient:
             return Response(
-                {"error": "No puedes ed."},
-                status=status.HTTP_401_UNAUTHORIZED,
+                {"error": "No eres cliente."},
+                status=status.HTTP_403_FORBIDDEN,
             )
         try:
             eventAct = Event.objects.get(id=kwargs["pk"])
