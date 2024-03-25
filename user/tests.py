@@ -1,4 +1,6 @@
 from django.test import TestCase
+
+from ocial.models import TypeClient
 from .models import OcialUser, OcialClient
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -32,7 +34,7 @@ class OcialUserTestCase(TestCase):
             djangoUser=self.user_2,
             name="asjodbgfaodvhier",
             identificationDocument="A12345678",  # cif
-            typeClient=OcialClient.TypeClient.ARTIST,
+            typeClient=TypeClient.ARTIST.value,
             defaultLatitude=40.7128,
             defaultLongitude=-40.7128,
         )
@@ -41,7 +43,7 @@ class OcialUserTestCase(TestCase):
             djangoUser=self.user_3,
             name="A",
             identificationDocument="X1234567A",  # nie
-            typeClient=OcialClient.TypeClient.BAR_RESTAURANT,
+            typeClient=TypeClient.BAR_RESTAURANT.value,
             defaultLatitude=40.7128,
             defaultLongitude=0.0,
         )
@@ -64,23 +66,23 @@ class OcialUserTestCase(TestCase):
             "email": "test@example.com",
             "lastKnowLocLat": 40.7128,
             "lastKnowLocLong": -40.7128,
-            "typesfavEventType": OcialUser.TypesfavEvent.MUSIC,
         }
         self.client_data = {
+            "password": "asjrfkuyllyllyly.1213",
+            "email": "user@example.com",
             "username": "testclient",
-            "password": "testpassword",
-            "email": "client@example.com",
-            "name": "Test Client",
-            "identification_document": "09981078K",
-            "typeClient": OcialClient.TypeClient.ARTIST,
-            "default_latitude": 40.7128,
-            "default_longitude": -40.7128,
+            "name": "string",
+            "identificationDocument": "81616045Q",
+            "typeClient": "Small business",
+            "defaultLatitude": 0,
+            "defaultLongitude": 0,
+            "djangoUser": 0,
         }
 
     def testGetUsers(self):
         self.list2 = [self.user1, self.user2, self.user3, self.user4]
         self.assertEqual(self.list1, self.list2)
-        self.assertEqual(self.user4.typeClient, OcialClient.TypeClient.SMALL_BUSINESS)
+        self.assertEqual(self.user4.typeClient, TypeClient.SMALL_BUSINESS.value)
 
     def testCreateUser(self):
         response = self.client.post(
@@ -174,7 +176,7 @@ class OcialUserTestCase(TestCase):
             "email": "client@example.com",
             # Missing name
             "identification_document": "A12345678",
-            "typeClient": OcialClient.TypeClient.ARTIST,
+            "typeClient": TypeClient.ARTIST.value,
             "default_latitude": 40.7128,
             "default_longitude": -40.7128,
         }
@@ -207,7 +209,6 @@ class OcialUserTestCase(TestCase):
             "email": "test@example.com",
             "lastKnowLocLat": 40.0,
             "lastKnowLocLong": 40.0,
-            "typesfavEventType": 1,
         }
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
