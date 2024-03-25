@@ -138,7 +138,7 @@ class EventCreate(generics.CreateAPIView):
             eventform.save()
             if image:
                 try:
-                    image_data = base64.b64decode(image, validate=True)
+                    image_data = base64.b64decode(image.split(";base64,")[1], validate=True)
                 except Exception:
                     eventform.instance.delete()
                     return Response(
@@ -149,6 +149,7 @@ class EventCreate(generics.CreateAPIView):
                 ext = format.split("/")[-1]
                 valid_ext = ["jpg", "jpeg", "png"]
                 if ext not in valid_ext:
+                    eventform.instance.delete()
                     return Response(
                         {"error": "Formato de imagen no válido"},
                         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -296,7 +297,7 @@ class EventUpdate(APIView):
             eventUpdate.save()
             if image:
                 try:
-                    image_data = base64.b64decode(image, validate=True)
+                    image_data = base64.b64decode(image.split(";base64,")[1], validate=True)
                 except Exception:
                     eventform.instance.delete()
                     return Response(
@@ -307,6 +308,7 @@ class EventUpdate(APIView):
                 ext = format.split("/")[-1]
                 valid_ext = ["jpg", "jpeg", "png"]
                 if ext not in valid_ext:
+                    eventform.instance.delete()
                     return Response(
                         {"error": "Formato de imagen no válido"},
                         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
