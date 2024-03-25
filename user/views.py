@@ -31,7 +31,7 @@ class RegisterUserView(APIView):
                 response=None, description="Los datos de la petición son incorrectos"
             ),
             409: OpenApiResponse(
-                response=None, description="El nombre de usuario ya existe"
+                response=None, description="El nombre de usuario o correo ya existe"
             ),
         },
     )
@@ -198,7 +198,10 @@ class RegisterClientView(APIView):
                 response=None, description="Los datos de la petición son incorrectos"
             ),
             409: OpenApiResponse(
-                response=None, description="El nombre de usuario ya existe"
+                response=None, description="El nombre de usuario o correo ya existe"
+            ),
+            422: OpenApiResponse(
+                response=None, description="Formato de imagen no válido"
             ),
         },
     )
@@ -252,6 +255,14 @@ class RegisterClientView(APIView):
                     )
                 ocialclientform.save()
                 if image:
+                    try:
+                        image_data = base64.b64decode(image, validate=True)
+                    except Exception:
+                        ocialclientform.instance.delete()
+                        return Response(
+                            {"error": "Formato de imagen no válido"},
+                            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        )
                     format, imgstr = data.get("image").split(";base64,")
                     ext = format.split("/")[-1]
                     valid_ext = ["jpg", "jpeg", "png"]
