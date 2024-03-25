@@ -223,7 +223,7 @@ class RegisterClientView(APIView):
             )
 
         data = request.data
-        image = data.get("image")
+        image = data.get("imageB64")
         userdata = {
             "username": username,
             "password1": password,
@@ -247,6 +247,7 @@ class RegisterClientView(APIView):
                     identificationDocument=data.get("identificationDocument")
                 )
                 if samenif:
+                    userCreated.delete()
                     return Response(
                         {
                             "errors": "Este documento de identificación ya se encuentra registrado"
@@ -256,17 +257,20 @@ class RegisterClientView(APIView):
                 ocialclientform.save()
                 if image:
                     try:
-                        image_data = base64.b64decode(image, validate=True)
+                        image_data = base64.b64decode(image.split(";base64,")[1], validate=True)
                     except Exception:
                         ocialclientform.instance.delete()
+                        userCreated.delete()
                         return Response(
-                            {"error": "Formato de imagen no válido"},
+                            {"error": "Formato de imagen no es base64 válido"},
                             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                         )
-                    format, imgstr = data.get("image").split(";base64,")
+                    format, imgstr = image.split(";base64,")
                     ext = format.split("/")[-1]
                     valid_ext = ["jpg", "jpeg", "png"]
                     if ext not in valid_ext:
+                        ocialclientform.instance.delete()
+                        userCreated.delete()
                         return Response(
                             {"error": "Formato de imagen no válido"},
                             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
