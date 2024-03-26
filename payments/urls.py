@@ -9,4 +9,8 @@ urlpatterns = [
     path('create-checkout-session-pro/', views.CreateCheckoutSessionPro),
     path('success/', views.SuccessView.as_view()),
     path('cancelled/', views.CancelledView.as_view()),
+    path('cancel-subscription-view/', views.CancelledSubscriptionView.as_view(), name='cancel_subscription_view'),
+    path('cancel-subscription/', views.CancelSubscription, name='cancel_subscription'),
+    path('reactivate-subscription/', views.ReactivateSubscription, name='reactivate_subscription'),
+
 ]
