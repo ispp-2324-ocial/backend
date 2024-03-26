@@ -439,7 +439,14 @@ class RatingCreate(APIView):
         },
     )
     def post(self, request, *args, **kwargs):
-        user = request.user
+
+        token = request.headers.get("Authorization")
+        if not token:
+            return Response(
+                {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+        token = token.split(" ")[1]
+        user = Token.objects.get(key=token).user
         # Verify if ocialuser
         try:
             ocial_user = user.ocialuser
@@ -503,7 +510,13 @@ class RatingDelete(generics.DestroyAPIView):
         },
     )
     def delete(self, request, *args, **kwargs):
-        user = request.user
+        token = request.headers.get("Authorization")
+        if not token:
+            return Response(
+                {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+        token = token.split(" ")[1]
+        user = Token.objects.get(key=token).user
             
         # Verificar si el usuario es un OcialUser
         try:
@@ -541,7 +554,13 @@ class RatingUpdate(generics.UpdateAPIView):
         },
     )
     def put(self, request, *args, **kwargs):
-        user = request.user
+        token = request.headers.get("Authorization")
+        if not token:
+            return Response(
+                {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+        token = token.split(" ")[1]
+        user = Token.objects.get(key=token).user
         
         # Verificar si el usuario es un OcialUser
         try:
