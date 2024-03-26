@@ -3,18 +3,7 @@ from django.contrib.auth.models import User
 from localflavor.es.models import ESIdentityCardNumberField
 from django.forms import ModelForm
 from ocial.models import *
-<<<<<<< HEAD
-
-class OcialUser(models.Model):
-    djangoUser = models.OneToOneField(User, on_delete=models.CASCADE)
-    lastKnowLocLat = models.FloatField()
-    lastKnowLocLong = models.FloatField()
-    category = models.TextField(
-        choices=[(category.value, category.name) for category in Category],
-        default=Category.SPORTS.value,
-    )
-=======
-
+from images.models import Image
 
 class OcialUser(models.Model):
     djangoUser = models.OneToOneField(User, on_delete=models.CASCADE)
