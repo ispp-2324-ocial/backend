@@ -12,31 +12,89 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('images', '0001_initial'),
+        ("images", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OcialUser',
+            name="OcialUser",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('auth_provider', models.TextField(choices=[('email', 'EMAIL'), ('google', 'GOOGLE')], default='email')),
-                ('lastKnowLocLat', models.FloatField()),
-                ('lastKnowLocLong', models.FloatField()),
-                ('djangoUser', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "auth_provider",
+                    models.TextField(
+                        choices=[("email", "EMAIL"), ("google", "GOOGLE")],
+                        default="email",
+                    ),
+                ),
+                ("lastKnowLocLat", models.FloatField()),
+                ("lastKnowLocLong", models.FloatField()),
+                (
+                    "djangoUser",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='OcialClient',
+            name="OcialClient",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField()),
-                ('identificationDocument', localflavor.es.models.ESIdentityCardNumberField(max_length=9)),
-                ('typeClient', models.TextField(choices=[('Small business', 'SMALL_BUSINESS'), ('Artist', 'ARTIST'), ('Bar Restaurant', 'BAR_RESTAURANT'), ('Local Guide', 'LOCAL_GUIDE'), ('Events And Concerts', 'EVENTS_AND_CONCERTS')], default='Small business')),
-                ('defaultLatitude', models.FloatField()),
-                ('defaultLongitude', models.FloatField()),
-                ('djangoUser', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('image', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='ClientImage', to='images.image')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.TextField()),
+                (
+                    "identificationDocument",
+                    localflavor.es.models.ESIdentityCardNumberField(max_length=9),
+                ),
+                (
+                    "typeClient",
+                    models.TextField(
+                        choices=[
+                            ("Small business", "SMALL_BUSINESS"),
+                            ("Artist", "ARTIST"),
+                            ("Bar Restaurant", "BAR_RESTAURANT"),
+                            ("Local Guide", "LOCAL_GUIDE"),
+                            ("Events And Concerts", "EVENTS_AND_CONCERTS"),
+                        ],
+                        default="Small business",
+                    ),
+                ),
+                ("defaultLatitude", models.FloatField()),
+                ("defaultLongitude", models.FloatField()),
+                (
+                    "djangoUser",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "image",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="ClientImage",
+                        to="images.image",
+                    ),
+                ),
             ],
         ),
     ]
