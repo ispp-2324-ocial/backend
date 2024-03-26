@@ -257,7 +257,9 @@ class RegisterClientView(APIView):
                 ocialclientform.save()
                 if image:
                     try:
-                        image_data = base64.b64decode(image.split(";base64,")[1], validate=True)
+                        image_data = base64.b64decode(
+                            image.split(";base64,")[1], validate=True
+                        )
                     except Exception:
                         ocialclientform.instance.delete()
                         userCreated.delete()
