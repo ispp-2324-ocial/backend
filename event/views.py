@@ -110,7 +110,12 @@ class EventCreate(generics.CreateAPIView):
             )
         token = token.split(" ")[1]
         user = Token.objects.get(key=token).user
-        ocialClient = OcialClient.objects.get(djangoUser=user)
+        try:
+            ocialClient = OcialClient.objects.get(djangoUser=user)
+        except OcialClient.DoesNotExist:
+            return Response(
+                {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
+            )
         request.data.pop("ocialClient")
         if not ocialClient:
             return Response(
@@ -135,7 +140,6 @@ class EventCreate(generics.CreateAPIView):
         }
         eventform = OcialEventForm(eventdata)
         if eventform.is_valid():
-            eventform.save()
             if image:
                 try:
                     image_data = base64.b64decode(image.split(";base64,")[1], validate=True)
@@ -164,8 +168,8 @@ class EventCreate(generics.CreateAPIView):
                         Image.open(imagefile), x_components=4, y_components=3
                     ),
                 )
-                eventform.instance.image = image
-                eventform.instance.save()
+                eventform.image = image
+            eventform.save()
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(
@@ -198,8 +202,9 @@ class EventDelete(generics.DestroyAPIView):
             )
         token = token.split(" ")[1]
         user = Token.objects.get(key=token).user
-        ocialClient = OcialClient.objects.get(djangoUser=user)
-        if not ocialClient:
+        try:
+            ocialClient = OcialClient.objects.get(djangoUser=user)
+        except OcialClient.DoesNotExist:
             return Response(
                 {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
             )
@@ -250,11 +255,11 @@ class EventUpdate(APIView):
             )
         token = token.split(" ")[1]
         user = Token.objects.get(key=token).user
-        ocialClient = OcialClient.objects.get(djangoUser=user)
-        if not ocialClient:
+        try:
+            ocialClient = OcialClient.objects.get(djangoUser=user)
+        except OcialClient.DoesNotExist:
             return Response(
-                {"error": "No eres cliente."},
-                status=status.HTTP_403_FORBIDDEN,
+                {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
             )
         try:
             eventAct = Event.objects.get(id=kwargs["pk"])
@@ -294,7 +299,6 @@ class EventUpdate(APIView):
             eventUpdate.category = data.get("category")
             eventUpdate.latitude = data.get("latitude")
             eventUpdate.longitude = data.get("longitude")
-            eventUpdate.save()
             if image:
                 try:
                     image_data = base64.b64decode(image.split(";base64,")[1], validate=True)
@@ -323,8 +327,8 @@ class EventUpdate(APIView):
                         Image.open(imagefile), x_components=4, y_components=3
                     ),
                 )
-                eventUpdate.instance.image = image
-                eventUpdate.instance.save()
+                eventUpdate.image = image
+            eventUpdate.save()
             return Response(status=status.HTTP_200_OK)
         return Response(eventform.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
