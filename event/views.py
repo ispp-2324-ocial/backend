@@ -103,26 +103,13 @@ class EventCreate(generics.CreateAPIView):
         },
     )
     def post(self, request, *args, **kwargs):
-<<<<<<< HEAD
-<<<<<<< HEAD
+        start = datetime.strptime(request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ")
+        end = datetime.strptime(request.data.get("timeEnd"), "%Y-%m-%dT%H:%M:%S.%fZ")
         token = request.headers.get("Authorization")
         if not token:
-=======
-        
-        start = datetime.strptime(request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ")
-=======
-
-        start = datetime.strptime(
-            request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ"
-        )
->>>>>>> aba9c25 (style: lint code)
-        end = datetime.strptime(request.data.get("timeEnd"), "%Y-%m-%dT%H:%M:%S.%fZ")
-        if not User.objects.filter(id=request.user.id).exists():
->>>>>>> 1115c54 (fix(event): solucion a las validaciones de las fechas)
             return Response(
                 {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
             )
-<<<<<<< HEAD
         token = token.split(" ")[1]
         user = Token.objects.get(key=token).user
         try:
@@ -131,39 +118,23 @@ class EventCreate(generics.CreateAPIView):
             return Response(
                 {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
             )
-<<<<<<< HEAD
-=======
-        
-=======
 
->>>>>>> aba9c25 (style: lint code)
-        if start > end:
-            return Response(
-                {"error": "El evento debe empezar antes de acabar"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if start < datetime.now() or end < datetime.now():
-            return Response(
-                {
-                    "error": "El evento debe empezar y acabar siempre en una fecha futura"
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if end - start > timedelta(days=1):
-            return Response(
-                {"error": "Un evento no puede durar mas de un dia"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
->>>>>>> 1115c54 (fix(event): solucion a las validaciones de las fechas)
         request.data.pop("ocialClient")
         if not ocialClient:
             return Response(
                 {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
             )
         request.data["ocialClient"] = ocialClient.id
+
+        if start > end:
+            return Response({"error": "El evento debe empezar antes de acabar"},status=status.HTTP_400_BAD_REQUEST,)
+
+        if start < datetime.now() or end < datetime.now():
+            return Response({"error": "El evento debe empezar y acabar siempre en una fecha futura"},status=status.HTTP_400_BAD_REQUEST,)
+        
+        if end - start > timedelta(days=1):
+            return Response({"error": "Un evento no puede durar mas de un dia"},status=status.HTTP_400_BAD_REQUEST,)
+        
         data = request.data
 
         image = data.get("imageB64")
@@ -180,6 +151,7 @@ class EventCreate(generics.CreateAPIView):
             "longitude": data.get("longitude"),
             "ocialClient": data.get("ocialClient"),
         }
+        
         eventform = OcialEventForm(eventdata)
         if eventform.is_valid():
             if image:
@@ -297,26 +269,14 @@ class EventUpdate(APIView):
         },
     )
     def put(self, request, *args, **kwargs):
-<<<<<<< HEAD
-<<<<<<< HEAD
-        token = request.headers.get("Authorization")
-        if not token:
-=======
         start = datetime.strptime(request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ")
-=======
-        start = datetime.strptime(
-            request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ"
-        )
->>>>>>> aba9c25 (style: lint code)
         end = datetime.strptime(request.data.get("timeEnd"), "%Y-%m-%dT%H:%M:%S.%fZ")
 
-        if not User.objects.filter(id=request.user.id).exists():
->>>>>>> 1115c54 (fix(event): solucion a las validaciones de las fechas)
+        token = request.headers.get("Authorization")
+        if not token:
             return Response(
                 {"error": "No estas autenticado."}, status=status.HTTP_401_UNAUTHORIZED
             )
-<<<<<<< HEAD
-<<<<<<< HEAD
         token = token.split(" ")[1]
         user = Token.objects.get(key=token).user
         try:
@@ -332,36 +292,6 @@ class EventUpdate(APIView):
                 {"error": "No existe el evento"}, status=status.HTTP_404_NOT_FOUND
             )
         if not (ocialClient.id == eventAct.ocialClient.id):
-=======
-            
-=======
-
->>>>>>> aba9c25 (style: lint code)
-        if start > end:
-            return Response(
-                {"error": "El evento debe empezar antes de acabar"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if start < datetime.now() or end < datetime.now():
-            return Response(
-                {
-                    "error": "El evento debe empezar y acabar siempre en una fecha futura"
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if end - start > timedelta(days=1):
-            return Response(
-                {"error": "Un evento no puede durar mas de un dia"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        request.data.pop("ocialClient")
-        ocialClient = OcialClient.objects.filter(djangoUser=request.user)
-        eventAct = Event.objects.filter(id=kwargs["pk"])
-        if not (ocialClient[0].id == eventAct[0].ocialClient.id):
->>>>>>> 1115c54 (fix(event): solucion a las validaciones de las fechas)
             return Response(
                 {"error": "No puedes actualizar datos de un evento de otro cliente"},
                 status=status.HTTP_403_FORBIDDEN,
@@ -369,6 +299,14 @@ class EventUpdate(APIView):
         request.data["ocialClient"] = ocialClient.id
         data = request.data
         image = data.get("imageB64")
+        if start > end:
+            return Response({"error": "El evento debe empezar antes de acabar"},status=status.HTTP_400_BAD_REQUEST,)
+
+        if start < datetime.now() or end < datetime.now():
+            return Response({"error": "El evento debe empezar y acabar siempre en una fecha futura"},status=status.HTTP_400_BAD_REQUEST,)
+        
+        if end - start > timedelta(days=1):
+            return Response({"error": "Un evento no puede durar mas de un dia"},status=status.HTTP_400_BAD_REQUEST,)
         eventdata = {
             "name": data.get("name"),
             "place": data.get("place"),
