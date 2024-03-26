@@ -1,28 +1,43 @@
 from django.db import models
-
+from django.forms import ModelForm
+from user.models import OcialClient
+from .models import *
+from ocial.models import *
 
 class Subscription(models.Model):
-    class TypeSubscription(models.TextChoices):
-        FREE = 0, ("Free")
-        BASIC = 1, ("Basic")
-        PRO = 2, ("Pro")
 
     typeSubscription = models.TextField(
-        choices=TypeSubscription.choices, default=TypeSubscription.FREE
+        choices=[(type.value,type.name)for type in TypeSubscription],
+        default = TypeSubscription.FREE.value
     )
-    numEvents = models.PositiveIntegerField()
+    numEvents = models.PositiveIntegerField(default=1)
     canEditEvent = models.BooleanField(default=False)
     canSendNotifications = models.BooleanField(default=False)
     canHaveRecurrentEvents = models.BooleanField(default=False)
     canHaveOustandingEvents = models.BooleanField(default=False)
     canHaveRating = models.BooleanField(default=False)
+    ocialClientId = models.ForeignKey(
+        OcialClient, related_name="OcialClientId", on_delete=models.CASCADE
+    )
 
-    def str(self):
-        return "{}".format(self.typeSubscription)
+    def __str__(self):
+        return f"{self.get_typeSubscription_display()} Subscription"
 
-    def save(self, args, **kwargs):
+    def save(self, *args, **kwargs):
         is_new = not self.pk
-        super().save(args, **kwargs)
+        super().save(*args, **kwargs)
 
         if is_new:
             self.typeSubscription
+            self.numEvents
+            self.canEditEvent
+            self.canSendNotifications
+            self.canHaveRecurrentEvents
+            self.canHaveOustandingEvents
+            self.canHaveRating
+            self.ocialClientId
+
+class SubscriptionForm(ModelForm):
+    class Meta:
+        model = Subscription
+        fields = '__all__'
