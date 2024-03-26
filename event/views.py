@@ -144,7 +144,6 @@ class EventCreate(generics.CreateAPIView):
                 try:
                     image_data = base64.b64decode(image.split(";base64,")[1], validate=True)
                 except Exception:
-                    eventform.instance.delete()
                     return Response(
                         {"error": "Formato de imagen no válido"},
                         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -153,11 +152,11 @@ class EventCreate(generics.CreateAPIView):
                 ext = format.split("/")[-1]
                 valid_ext = ["jpg", "jpeg", "png"]
                 if ext not in valid_ext:
-                    eventform.instance.delete()
                     return Response(
                         {"error": "Formato de imagen no válido"},
                         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     )
+                eventform.save()
                 imagefile = ContentFile(
                     base64.b64decode(imgstr),
                     name=f"event-{eventform.instance.id}.{ext}",
@@ -168,7 +167,8 @@ class EventCreate(generics.CreateAPIView):
                         Image.open(imagefile), x_components=4, y_components=3
                     ),
                 )
-                eventform.image = image
+                eventform.instance.image = image
+                eventform.instance.save()
             eventform.save()
             return Response(status=status.HTTP_201_CREATED)
         else:
@@ -308,7 +308,7 @@ class EventUpdate(APIView):
                         {"error": "Formato de imagen no válido"},
                         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     )
-                format, imgstr = data.get("image").split(";base64,")
+                format, imgstr = image.split(";base64,")
                 ext = format.split("/")[-1]
                 valid_ext = ["jpg", "jpeg", "png"]
                 if ext not in valid_ext:
@@ -319,7 +319,7 @@ class EventUpdate(APIView):
                     )
                 imagefile = ContentFile(
                     base64.b64decode(imgstr),
-                    name=f"event-{eventUpdate.instance.id}.{ext}",
+                    name=f"event-{eventUpdate.id}.{ext}",
                 )
                 image = ImageModel.objects.create(
                     image=imagefile,
