@@ -5,7 +5,8 @@ from django.forms import ModelForm
 from ocial.models import *
 from images.models import Image
 
-from datetime import  timedelta
+from datetime import timedelta
+
 
 # Create your models here.
 class Event(models.Model):
@@ -26,12 +27,12 @@ class Event(models.Model):
                 "The timeStart cannot be a date greater than timeEnd!"
             )
         super(Event, self).save(*args, **kwargs)
-        
+
     def oneDay(self, *args, **kwargs):
         if self.timeEnd - self.timeStart > timedelta(days=1):
             raise ValidationError("An event cannot last more than 1 day!")
         super(Event, self).save(*args, **kwargs)
-    
+
     # def oneDay(self, *args, **kwargs):
     #     if self.timeEnd - self.timeStart < 0:
     #         raise ValidationError("An event cannot last less than 1 day!")
