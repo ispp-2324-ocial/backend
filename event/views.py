@@ -103,7 +103,9 @@ class EventCreate(generics.CreateAPIView):
         },
     )
     def post(self, request, *args, **kwargs):
-        start = datetime.strptime(request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ")
+        start = datetime.strptime(
+            request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ"
+        )
         end = datetime.strptime(request.data.get("timeEnd"), "%Y-%m-%dT%H:%M:%S.%fZ")
         token = request.headers.get("Authorization")
         if not token:
@@ -127,14 +129,25 @@ class EventCreate(generics.CreateAPIView):
         request.data["ocialClient"] = ocialClient.id
 
         if start > end:
-            return Response({"error": "El evento debe empezar antes de acabar"},status=status.HTTP_400_BAD_REQUEST,)
+            return Response(
+                {"error": "El evento debe empezar antes de acabar"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if start < datetime.now() or end < datetime.now():
-            return Response({"error": "El evento debe empezar y acabar siempre en una fecha futura"},status=status.HTTP_400_BAD_REQUEST,)
-        
+            return Response(
+                {
+                    "error": "El evento debe empezar y acabar siempre en una fecha futura"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if end - start > timedelta(days=1):
-            return Response({"error": "Un evento no puede durar mas de un dia"},status=status.HTTP_400_BAD_REQUEST,)
-        
+            return Response(
+                {"error": "Un evento no puede durar mas de un dia"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         data = request.data
 
         image = data.get("imageB64")
@@ -151,7 +164,7 @@ class EventCreate(generics.CreateAPIView):
             "longitude": data.get("longitude"),
             "ocialClient": data.get("ocialClient"),
         }
-        
+
         eventform = OcialEventForm(eventdata)
         if eventform.is_valid():
             if image:
@@ -269,7 +282,9 @@ class EventUpdate(APIView):
         },
     )
     def put(self, request, *args, **kwargs):
-        start = datetime.strptime(request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ")
+        start = datetime.strptime(
+            request.data.get("timeStart"), "%Y-%m-%dT%H:%M:%S.%fZ"
+        )
         end = datetime.strptime(request.data.get("timeEnd"), "%Y-%m-%dT%H:%M:%S.%fZ")
 
         token = request.headers.get("Authorization")
@@ -300,13 +315,24 @@ class EventUpdate(APIView):
         data = request.data
         image = data.get("imageB64")
         if start > end:
-            return Response({"error": "El evento debe empezar antes de acabar"},status=status.HTTP_400_BAD_REQUEST,)
+            return Response(
+                {"error": "El evento debe empezar antes de acabar"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if start < datetime.now() or end < datetime.now():
-            return Response({"error": "El evento debe empezar y acabar siempre en una fecha futura"},status=status.HTTP_400_BAD_REQUEST,)
-        
+            return Response(
+                {
+                    "error": "El evento debe empezar y acabar siempre en una fecha futura"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if end - start > timedelta(days=1):
-            return Response({"error": "Un evento no puede durar mas de un dia"},status=status.HTTP_400_BAD_REQUEST,)
+            return Response(
+                {"error": "Un evento no puede durar mas de un dia"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         eventdata = {
             "name": data.get("name"),
             "place": data.get("place"),
