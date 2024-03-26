@@ -142,7 +142,9 @@ class EventCreate(generics.CreateAPIView):
         if eventform.is_valid():
             if image:
                 try:
-                    image_data = base64.b64decode(image.split(";base64,")[1], validate=True)
+                    image_data = base64.b64decode(
+                        image.split(";base64,")[1], validate=True
+                    )
                 except Exception:
                     return Response(
                         {"error": "Formato de imagen no válido"},
@@ -186,7 +188,9 @@ class EventDelete(generics.DestroyAPIView):
             204: OpenApiResponse(
                 response=None, description="El evento se ha eliminado"
             ),
-            401: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
+            401: OpenApiResponse(
+                response=None, description="El usuario no ha iniciado sesión"
+            ),
             400: OpenApiResponse(
                 response=None, description="El usuario no ha iniciado sesión"
             ),
@@ -215,7 +219,8 @@ class EventDelete(generics.DestroyAPIView):
             )
         if not (ocialClient.id == eventAct[0].ocialClient.id):
             return Response(
-                {"error": "No puedes borrar el evento de otra persona"}, status=status.HTTP_403_FORBIDDEN
+                {"error": "No puedes borrar el evento de otra persona"},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         if eventAct.exists():
@@ -235,7 +240,9 @@ class EventUpdate(APIView):
             200: OpenApiResponse(
                 response=None, description="El evento se ha actualizado"
             ),
-            401: OpenApiResponse(response=None, description="El usuario no ha iniciado sesión"),
+            401: OpenApiResponse(
+                response=None, description="El usuario no ha iniciado sesión"
+            ),
             400: OpenApiResponse(
                 response=None, description="El usuario no ha iniciado sesión"
             ),
@@ -301,7 +308,9 @@ class EventUpdate(APIView):
             eventUpdate.longitude = data.get("longitude")
             if image:
                 try:
-                    image_data = base64.b64decode(image.split(";base64,")[1], validate=True)
+                    image_data = base64.b64decode(
+                        image.split(";base64,")[1], validate=True
+                    )
                 except Exception:
                     eventform.instance.delete()
                     return Response(
