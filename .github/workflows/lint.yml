@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v4.1.1
         with:
           show-progress: false
+          fetch-depth: 0
 
       - name: Lint
         uses: psf/black@stable
@@ -32,7 +33,14 @@ jobs:
       - name: Remove unused variables
         run: autoflake --recursive --in-place --exclude=settings.py  --remove-all-unused-imports --remove-duplicate-keys --remove-unused-variables .
 
+      # In case other workflows pushed changes before this one
+      - name: Pull new changes
+        run: |
+          git config pull.rebase true
+          git config rebase.autoStash true
+          git pull
+
       - name: Push formatted code
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v5.0.0
         with:
           commit_message: "style: lint code"
