@@ -149,10 +149,10 @@ class SubscriptionUpdate(APIView):
         request=SubscriptionCreateUpdateSerializer,
         description="Update the subscription of the authenticated user",
         responses={
-            200: SubscriptionCreateUpdateSerializer,
-            400: "Bad Request",
-            401: "Unauthorized",
-            403: "Forbidden",
+            200: OpenApiResponse(response=SubscriptionCreateUpdateSerializer),
+            400: OpenApiResponse(description="Bad Request"),
+            401: OpenApiResponse(description="Unauthorized"),
+            403: OpenApiResponse(description="Forbidden"),
         },
     )
     def put(self, request, *args, **kwargs):
