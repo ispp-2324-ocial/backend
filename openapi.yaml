@@ -152,6 +152,34 @@ paths:
           description: ''
         '400':
           description: Error in request
+  /api/event/{id}/client/:
+    get:
+      operationId: event_client_retrieve
+      description: Get client instance by event id
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OcialClient'
+          description: ''
+        '404':
+          description: Event not found
+        '400':
+          description: Error in request
   /api/event/{id}/delete/:
     delete:
       operationId: event_delete_destroy
@@ -169,9 +197,103 @@ paths:
       - {}
       responses:
         '204':
-          description: Event deleted successfully
+          description: El evento se ha eliminado
+        '401':
+          description: El usuario no ha iniciado sesión
+        '400':
+          description: El usuario no ha iniciado sesión
+        '403':
+          description: El usuario no es cliente
         '404':
-          description: Message not found
+          description: El evento no existe
+  /api/event/{id}/like/:
+    get:
+      operationId: event_like_list
+      description: Get likes of an event
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Like'
+          description: List of likes
+        '404':
+          description: Event not found
+    post:
+      operationId: event_like_create
+      description: Like an event
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Like'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Like'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Like'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+          description: Event liked
+        '404':
+          description: Event not found
+        '401':
+          description: Not authenticated
+        '400':
+          description: Already liked event
+    delete:
+      operationId: event_like_destroy
+      description: Unlike an event
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: Event unliked
+        '404':
+          description: Event not found
+        '401':
+          description: Not authenticated
+        '400':
+          description: Not liked event
   /api/event/{id}/update/:
     put:
       operationId: event_update_update
@@ -200,41 +322,16 @@ paths:
       - tokenAuth: []
       - {}
       responses:
-        '201':
-          description: No response body
-        '400':
-          description: Error in request
-    patch:
-      operationId: event_update_partial_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        required: true
-      tags:
-      - event
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedEvent'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedEvent'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedEvent'
-      security:
-      - tokenAuth: []
-      - {}
-      responses:
         '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Event'
-          description: ''
+          description: El evento se ha actualizado
+        '401':
+          description: El usuario no ha iniciado sesión
+        '400':
+          description: El usuario no ha iniciado sesión
+        '403':
+          description: El evento no pertenece al usuario activo
+        '422':
+          description: El formulario contiene errores
   /api/event/create/:
     post:
       operationId: event_create_create
@@ -258,9 +355,15 @@ paths:
       - {}
       responses:
         '201':
-          description: No response body
+          description: El evento se ha creado
+        '401':
+          description: No estás logueado
         '400':
-          description: Error in request
+          description: El formulario contiene errores
+        '403':
+          description: El usuario no es cliente
+        '422':
+          description: La imagen no tiene un formato válido
   /api/event/list/:
     get:
       operationId: event_list_list
@@ -305,8 +408,10 @@ paths:
                 items:
                   $ref: '#/components/schemas/Event'
           description: ''
-        '400':
-          description: Error in request
+        '401':
+          description: No estás logueado
+        '404':
+          description: No existe el cliente
   /api/event/nearby/:
     get:
       operationId: event_nearby_list
@@ -349,26 +454,106 @@ paths:
           description: ''
         '400':
           description: Error in request
-  /api/event/rating/{id}/delete/:
-    delete:
-      operationId: event_rating_delete_destroy
-      description: Delete a rating
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        required: true
+  /api/subscription/create/:
+    post:
+      operationId: subscription_create_create
+      description: Create a new subscription with specific behavior based on subscription
+        type.
       tags:
-      - event
+      - subscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionCreateUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubscriptionCreateUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubscriptionCreateUpdate'
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          description: ''
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /api/subscription/delete/:
+    delete:
+      operationId: subscription_delete_destroy
+      description: Delete the current subscription of the authenticated user.
+      tags:
+      - subscription
       security:
       - tokenAuth: []
       - {}
       responses:
         '204':
-          description: Rating deleted successfully
+          description: Subscription deleted successfully
+        '401':
+          description: Unauthorized
         '404':
-          description: Message not found
+          description: Subscription not found
+  /api/subscription/get/:
+    get:
+      operationId: subscription_get_list
+      description: Retrieve the current subscription for the authenticated user.
+      tags:
+      - subscription
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+          description: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+  /api/subscription/update/:
+    put:
+      operationId: subscription_update_update
+      description: Update the subscription of the authenticated user
+      tags:
+      - subscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionCreateUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubscriptionCreateUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubscriptionCreateUpdate'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionCreateUpdate'
+          description: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
   /api/users/client/register/:
     post:
       operationId: users_client_register_create
@@ -395,7 +580,9 @@ paths:
         '400':
           description: Los datos de la petición son incorrectos
         '409':
-          description: El nombre de usuario ya existe
+          description: El nombre de usuario o correo ya existe
+        '422':
+          description: Formato de imagen no válido
   /api/users/login/:
     post:
       operationId: users_login_create
@@ -444,6 +631,35 @@ paths:
             lo que se considera que la sesión está cerrada
         '401':
           description: El usuario no está autenticado
+  /api/users/user/google-oauth2/:
+    post:
+      operationId: users_user_google_oauth2_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleSocialAuth'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GoogleSocialAuth'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GoogleSocialAuth'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoogleSocialAuthResponse'
+          description: Datos del usuario autenticado
+        '400':
+          description: Los datos de la petición son incorrectos
   /api/users/user/register/:
     post:
       operationId: users_user_register_create
@@ -470,9 +686,17 @@ paths:
         '400':
           description: Los datos de la petición son incorrectos
         '409':
-          description: El nombre de usuario ya existe
+          description: El nombre de usuario o correo ya existe
 components:
   schemas:
+    AuthProviderEnum:
+      enum:
+      - email
+      - google
+      type: string
+      description: |-
+        * `email` - EMAIL
+        * `google` - GOOGLE
     CategoryEnum:
       enum:
       - Sports
@@ -514,34 +738,50 @@ components:
         username:
           type: string
           writeOnly: true
+        imageB64:
+          type: string
+          writeOnly: true
+        image:
+          allOf:
+          - $ref: '#/components/schemas/Image'
+          readOnly: true
         name:
           type: string
-        identification_document:
+        identificationDocument:
           type: string
           maxLength: 9
         typeClient:
           $ref: '#/components/schemas/TypeClientEnum'
-        default_latitude:
+        defaultLatitude:
           type: number
           format: double
-        default_longitude:
+        defaultLongitude:
           type: number
           format: double
-        usuario:
+        djangoUser:
           type: integer
       required:
-      - default_latitude
-      - default_longitude
-      - identification_document
+      - defaultLatitude
+      - defaultLongitude
+      - djangoUser
+      - identificationDocument
       - name
       - password
       - username
-      - usuario
     Event:
       type: object
       properties:
         id:
           type: integer
+          readOnly: true
+        ocialClient:
+          $ref: '#/components/schemas/OcialClient'
+        imageB64:
+          type: string
+          writeOnly: true
+        image:
+          allOf:
+          - $ref: '#/components/schemas/Image'
           readOnly: true
         name:
           type: string
@@ -549,12 +789,12 @@ components:
           type: string
         event:
           type: string
-        date:
+        timeStart:
           type: string
-          format: date
-        hour:
+          format: date-time
+        timeEnd:
           type: string
-          format: time
+          format: date-time
         capacity:
           type: integer
           maximum: 2147483647
@@ -567,17 +807,57 @@ components:
         longitude:
           type: number
           format: double
-        ocialClient:
-          type: integer
       required:
-      - date
       - event
-      - hour
       - latitude
       - longitude
       - name
       - ocialClient
       - place
+    GoogleSocialAuth:
+      type: object
+      properties:
+        auth_token:
+          type: string
+      required:
+      - auth_token
+    GoogleSocialAuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          readOnly: true
+        isClient:
+          type: boolean
+      required:
+      - isClient
+    Image:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        image:
+          type: string
+          format: uri
+        blurhash:
+          type: string
+      required:
+      - blurhash
+      - image
+    Like:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        event:
+          type: integer
+        user:
+          type: integer
+      required:
+      - event
+      - user
     LoginUser:
       type: object
       description: |-
@@ -608,10 +888,10 @@ components:
         content:
           type: string
           maxLength: 255
-        chat:
+        chatId:
           type: integer
       required:
-      - chat
+      - chatId
       - content
     MessageCreate:
       type: object
@@ -622,43 +902,54 @@ components:
         content:
           type: string
           maxLength: 255
-        chat:
-          type: integer
       required:
-      - chat
       - content
-    PatchedEvent:
+    OcialClient:
+      type: object
+      properties:
+        name:
+          type: string
+        defaultLatitude:
+          type: number
+          format: double
+        defaultLongitude:
+          type: number
+          format: double
+      required:
+      - defaultLatitude
+      - defaultLongitude
+      - name
+    Subscription:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        name:
-          type: string
-        place:
-          type: string
-        event:
-          type: string
-        date:
-          type: string
-          format: date
-        hour:
-          type: string
-          format: time
-        capacity:
+        typeSubscription:
+          $ref: '#/components/schemas/TypeSubscriptionEnum'
+        numEvents:
           type: integer
           maximum: 2147483647
           minimum: 0
-        category:
-          $ref: '#/components/schemas/CategoryEnum'
-        latitude:
-          type: number
-          format: double
-        longitude:
-          type: number
-          format: double
-        ocialClient:
+        canEditEvent:
+          type: boolean
+        canSendNotifications:
+          type: boolean
+        canHaveRecurrentEvents:
+          type: boolean
+        canHaveOustandingEvents:
+          type: boolean
+        canHaveRating:
+          type: boolean
+        ocialClientId:
           type: integer
+      required:
+      - ocialClientId
+    SubscriptionCreateUpdate:
+      type: object
+      properties:
+        typeSubscription:
+          $ref: '#/components/schemas/TypeSubscriptionEnum'
     TokenResponse:
       type: object
       properties:
@@ -683,6 +974,16 @@ components:
         * `Bar Restaurant` - BAR_RESTAURANT
         * `Local Guide` - LOCAL_GUIDE
         * `Events And Concerts` - EVENTS_AND_CONCERTS
+    TypeSubscriptionEnum:
+      enum:
+      - Free
+      - Basic
+      - Pro
+      type: string
+      description: |-
+        * `Free` - FREE
+        * `Basic` - BASIC
+        * `Pro` - PRO
     User:
       type: object
       properties:
@@ -699,22 +1000,22 @@ components:
         username:
           type: string
           writeOnly: true
+        auth_provider:
+          $ref: '#/components/schemas/AuthProviderEnum'
         lastKnowLocLat:
           type: number
           format: double
         lastKnowLocLong:
           type: number
           format: double
-        category:
-          $ref: '#/components/schemas/CategoryEnum'
-        usuario:
+        djangoUser:
           type: integer
       required:
+      - djangoUser
       - lastKnowLocLat
       - lastKnowLocLong
       - password
       - username
-      - usuario
   securitySchemes:
     tokenAuth:
       type: apiKey
