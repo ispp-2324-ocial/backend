@@ -9,12 +9,11 @@ on:
     branches:
       - develop
   pull_request:
-    branches:
-      - develop
 
 jobs:
   generate:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     env:
       DEBUG: True
       KEY: ${{ secrets.SECRET_KEY }}
@@ -47,26 +46,29 @@ jobs:
         run: python ./manage.py spectacular --file openapi.yaml --validate --fail-on-warn
 
       - name: Check if the schema was modified
-        if: ${{ github.event_name == 'push' }}
         id: diff
         run: echo "count=$(git status -su | grep openapi.yaml | wc -l)" >> $GITHUB_OUTPUT
 
       # In case other workflows pushed changes before this one
       - name: Pull new changes
-        if: ${{ steps.diff.outputs.count > 0 && github.event_name == 'push' }}
+        if: ${{ steps.diff.outputs.count > 0 }}
         run: |
           git config pull.rebase true
           git config rebase.autoStash true
           git pull
 
       - name: Push formatted code
-        if: ${{ steps.diff.outputs.count > 0 && github.event_name == 'push' }}
-        uses: stefanzweifel/git-auto-commit-action@v5
+        if: ${{ steps.diff.outputs.count > 0 }}
+        uses: stefanzweifel/git-auto-commit-action@v5.0.0
         with:
           commit_message: "ci: update openapi.yaml"
 
+  dispatch:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
       - name: Trigger generation workflow in axios-apiclient
-        if: ${{ steps.diff.outputs.count > 0 && github.event_name == 'push' }}
         uses: convictional/trigger-workflow-and-wait@v1.6.5
         with:
           owner: ispp-2324-ocial
