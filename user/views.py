@@ -191,7 +191,7 @@ class RegisterClientView(APIView):
     permission_classes = [permissions.AllowAny]
 
     @extend_schema(
-        request=ClientSerializer,
+        request=ClientCreateSerializer,
         responses={
             200: OpenApiResponse(response=None),
             400: OpenApiResponse(
