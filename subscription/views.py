@@ -1,7 +1,7 @@
 from rest_framework import generics
-
+from rest_framework.views import APIView
 from subscription.models import Subscription
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.openapi import OpenApiResponse
@@ -12,7 +12,6 @@ from django.contrib.auth.models import User
 from user.models import OcialClient
 from rest_framework.permissions import IsAuthenticated
 from .models import SubscriptionForm
-from rest_framework import mixins
 
 
 SUBSCRIPTION_DETAILS = {
@@ -143,16 +142,17 @@ class SubscriptionCreate(generics.CreateAPIView):
             )
 
 
-class SubscriptionUpdate(generics.UpdateAPIView):
+class SubscriptionUpdate(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = SubscriptionCreateUpdateSerializer
 
     @extend_schema(
         request=SubscriptionCreateUpdateSerializer,
-        description="Update an subscription",
+        description="Update the subscription of the authenticated user",
         responses={
-            200: OpenApiResponse(response=None, description="Subscription updated successfully"),
-            400: OpenApiResponse(response=None, description="Error in request"),
+            200: SubscriptionCreateUpdateSerializer,
+            400: "Bad Request",
+            401: "Unauthorized",
+            403: "Forbidden",
         },
     )
     def put(self, request, *args, **kwargs):
@@ -170,49 +170,17 @@ class SubscriptionUpdate(generics.UpdateAPIView):
         if not User.objects.filter(id=user.id).exists():
             return Response({"error": "No estás logueado"}, status=status.HTTP_400_BAD_REQUEST)
 
-        ocialClient = OcialClient.objects.filter(djangoUser=user)
-        subscriptionAct = Subscription.objects.filter(id=kwargs["pk"])
-        if not (ocialClient.exists() and ocialClient[0].id == subscriptionAct[0].ocialClientId.id):
-            return Response({"error": "No puedes actualizar datos de un evento de otro cliente"},
-                            status=status.HTTP_403_FORBIDDEN)
-
-        if not subscriptionAct.exists():
-            return Response({"error": "No se encontró la suscripción a actualizar"},
+        try:
+            subscription = Subscription.objects.get(ocialClientId__djangoUser=user)
+        except Subscription.DoesNotExist:
+            return Response({"error": "No se encontró la suscripción del usuario"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        ocialClient = ocialClient[0]
-        request.data["ocialClientId"] = ocialClient
-        data = request.data
-
-        type_subscription = request.data.get('typeSubscription')
-        if type_subscription not in ['Free', 'Basic', 'Pro']:
-            return Response({"error": "El parametro typeSubscription debe ser Free, Basic o Pro"},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        subscription_update_data = {
-            'typeSubscription': type_subscription,
-            'numEvents': SUBSCRIPTION_DETAILS[type_subscription]['numEvents'],
-            'canEditEvent': SUBSCRIPTION_DETAILS[type_subscription]['canEditEvent'],
-            'canSendNotifications': SUBSCRIPTION_DETAILS[type_subscription]['canSendNotifications'],
-            'canHaveRecurrentEvents': SUBSCRIPTION_DETAILS[type_subscription]['canHaveRecurrentEvents'],
-            'canHaveOustandingEvents': SUBSCRIPTION_DETAILS[type_subscription]['canHaveOustandingEvents'],
-            'canHaveRating': SUBSCRIPTION_DETAILS[type_subscription]['canHaveRating'],
-            "ocialClientId": data.get("ocialClientId"),
-        }
-
-        subscriptionUpdate = subscriptionAct[0]
-
-        # Comprobar si los datos de actualización son iguales a los datos existentes
-        if all(getattr(subscriptionUpdate, key) == value for key, value in subscription_update_data.items()):
-            return Response({"error": "No se realizaron cambios en la suscripción"},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        # Actualizar la suscripción
-        for key, value in subscription_update_data.items():
-            setattr(subscriptionUpdate, key, value)
-        subscriptionUpdate.save()
-
-        return Response(status=status.HTTP_200_OK)
+        serializer = SubscriptionCreateUpdateSerializer(subscription, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SubscriptionDelete(generics.DestroyAPIView):
