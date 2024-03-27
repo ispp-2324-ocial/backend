@@ -5,7 +5,6 @@ from django.forms import ModelForm
 from ocial.models import *
 from images.models import Image
 
-from datetime import timedelta
 
 
 # Create your models here.
