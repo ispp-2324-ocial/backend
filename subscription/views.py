@@ -142,6 +142,8 @@ class SubscriptionCreate(generics.CreateAPIView):
             )
 
 
+from django.http import JsonResponse
+
 class SubscriptionUpdate(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -179,8 +181,19 @@ class SubscriptionUpdate(APIView):
         serializer = SubscriptionCreateUpdateSerializer(subscription, data=request.data)
         if serializer.is_valid():
             serializer.save()
+
+            type_subscription = serializer.validated_data.get('typeSubscription')
+            if type_subscription in SUBSCRIPTION_DETAILS:
+                subscription_details = SUBSCRIPTION_DETAILS[type_subscription]
+                for key, value in subscription_details.items():
+                    setattr(subscription, key, value)
+                subscription.save()
+            else:
+                return JsonResponse({"error": "Tipo de suscripción no válido"}, status=status.HTTP_400_BAD_REQUEST)
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class SubscriptionDelete(generics.DestroyAPIView):
