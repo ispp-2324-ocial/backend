@@ -7,15 +7,15 @@ concurrency:
 on:
   push:
     branches:
-      - main
       - develop
   pull_request:
     branches:
-      - main
       - develop
+
 jobs:
   generate:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     env:
       DEBUG: True
       KEY: ${{ secrets.SECRET_KEY }}
@@ -24,6 +24,9 @@ jobs:
       DB_PASSWORD: ocialpass123
       DB_HOST: localhost
       DB_PORT: 5432
+    
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout ⬇️
@@ -48,15 +51,31 @@ jobs:
         id: diff
         run: echo "count=$(git status -su | grep openapi.yaml | wc -l)" >> $GITHUB_OUTPUT
 
-      # "echo" in commit returns true so the build succeeds, even if no changed files
-      - name: Commit new changes to the repo
-        if: ${{ steps.diff.outputs.count > 0 && github.event_name != 'pull_request' }}
+      # In case other workflows pushed changes before this one
+      - name: Pull new changes
+        if: ${{ steps.diff.outputs.count > 0 }}
         run: |
-          git config user.name GitHub Actions
-          git config user.email action@github.com
           git config pull.rebase true
           git config rebase.autoStash true
           git pull
-          git add .
-          git commit -m "ci: update OpenAPI schema" || echo
-          git push
+
+      - name: Push formatted code
+        if: ${{ steps.diff.outputs.count > 0 }}
+        uses: stefanzweifel/git-auto-commit-action@v5.0.0
+        with:
+          commit_message: "ci: update openapi.yaml"
+
+  dispatch:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
+      - name: Trigger generation workflow in axios-apiclient
+        uses: convictional/trigger-workflow-and-wait@v1.6.5
+        with:
+          owner: ispp-2324-ocial
+          repo: axios-apiclient
+          github_token: ${{ secrets.GH_TOKEN }}
+          workflow_file_name: generation.yml
+          ref: ${{ github.ref_name }}
+          wait_workflow: false

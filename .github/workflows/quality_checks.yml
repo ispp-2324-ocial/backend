@@ -6,7 +6,18 @@ concurrency:
 
 on:
   pull_request:
+    branches:
+      - main
+      - develop
   merge_group:
+
+env:
+  DB_IMAGE: postgres:latest
+  DB_NAME: ocialdb
+  DB_USERNAME: ocialuser
+  DB_PASSWORD: ocialpass123
+  # Necesario porque el contenedor no tiene comprobaciones de su salud
+  DB_OPTIONS: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 
 
 jobs:
   dependency-review:
@@ -26,6 +37,82 @@ jobs:
           base-ref: ${{ github.event.pull_request.base.sha || 'master' }}
           head-ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
+  run:
+    name: Run 🏃‍♂️
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: ${{ env.DB_IMAGE }}
+        env:
+          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_USER: ${{ env.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: ${{ env.DB_OPTIONS }}
+
+    steps:
+      - name: Checkout ⬇️
+        uses: actions/checkout@v4.1.1
+        with:
+          show-progress: false
+
+      - name: Setup Python 🐍
+        uses: actions/setup-python@v5.0.0
+        with:
+          python-version: '3.x'
+          check-latest: true
+
+      - name: Install dependencies 📦
+        run: pip install -r requirements.txt
+
+      - name: Perform migrations 🗃️
+        run: python ./manage.py migrate
+
+      - name: Run Django Server 🏃‍♂️
+        run: |
+          python manage.py runserver &
+          sleep 10 # Espera a que el servidor esté listo
+
+      - name: Check server 🩺
+        run: |
+          curl -I http://127.0.0.1:8000/
+          sudo pkill python
+
+  test:
+    name: Test backend 👨‍🔬
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: ${{ env.DB_IMAGE }}
+        env:
+          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_USER: ${{ env.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: ${{ env.DB_OPTIONS }}
+
+    steps:
+      - name: Checkout ⬇️
+        uses: actions/checkout@v4.1.1
+        with:
+          show-progress: false
+
+      - name: Setup Python 🐍
+        uses: actions/setup-python@v5.0.0
+        with:
+          python-version: '3.x'
+          check-latest: true
+
+      - name: Install dependencies 📦
+        run: pip install -r requirements.txt
+
+      - name: Perform tests ⚒️
+        run: python ./manage.py test
+
   pr_context:
     name: Save PR context as artifact
     if: ${{ always() && !cancelled() && github.event_name == 'pull_request' }}
@@ -33,6 +120,8 @@ jobs:
     ## Add needed jobs here
     needs:
       - dependency-review
+      - test
+      - run
 
     steps:
       - name: Save PR context
@@ -65,3 +154,18 @@ jobs:
 
       - name: Check if all commits comply with the specification
         uses: webiny/action-conventional-commits@v1.3.0
+
+  no_merge_commits:
+    name: No merge commits check 🚫
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout ⬇️
+        uses: actions/checkout@v4.1.1
+        with:
+          show-progress: false
+          fetch-depth: 0
+
+      - name: Check commits
+        uses: greenled/no-merge-commits-check@v1.0.1
