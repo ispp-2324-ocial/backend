@@ -45,6 +45,7 @@ class ClientCreateSerializer(serializers.ModelSerializer):
         model = OcialClient
         fields = "__all__"
 
+
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     email = serializers.EmailField(write_only=True, required=False)

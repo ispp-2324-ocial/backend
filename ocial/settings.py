@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework.authtoken",
     "images",
-    "subscription"
+    "subscription",
 ]
 
 STATIC_URL = "/static/"
