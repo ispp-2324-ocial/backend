@@ -6,6 +6,9 @@ concurrency:
 
 on:
   pull_request:
+    branches:
+      - main
+      - develop
   merge_group:
 
 env:
