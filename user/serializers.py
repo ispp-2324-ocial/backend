@@ -28,13 +28,22 @@ class ClientSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     email = serializers.EmailField(write_only=True, required=False)
     username = serializers.CharField(write_only=True)
-    imageB64 = serializers.CharField(write_only=True, required=False)
     image = ImageSerializer(read_only=True)
 
     class Meta:
         model = OcialClient
         fields = "__all__"
 
+
+class ClientCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True, required=False)
+    username = serializers.CharField(write_only=True)
+    imageB64 = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = OcialClient
+        fields = "__all__"
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
