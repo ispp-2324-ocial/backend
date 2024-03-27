@@ -6,7 +6,6 @@ from ocial.models import *
 from images.models import Image
 
 
-
 # Create your models here.
 class Event(models.Model):
     name = models.TextField()

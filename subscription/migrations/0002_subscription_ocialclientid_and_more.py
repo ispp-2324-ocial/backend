@@ -7,25 +7,33 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0001_initial'),
-        ('subscription', '0001_initial'),
+        ("user", "0001_initial"),
+        ("subscription", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='subscription',
-            name='ocialClientId',
-            field=models.ForeignKey(default=0, on_delete=django.db.models.deletion.CASCADE, related_name='OcialClientId', to='user.ocialclient'),
+            model_name="subscription",
+            name="ocialClientId",
+            field=models.ForeignKey(
+                default=0,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="OcialClientId",
+                to="user.ocialclient",
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='subscription',
-            name='numEvents',
+            model_name="subscription",
+            name="numEvents",
             field=models.PositiveIntegerField(default=1),
         ),
         migrations.AlterField(
-            model_name='subscription',
-            name='typeSubscription',
-            field=models.TextField(choices=[('Free', 'FREE'), ('Basic', 'BASIC'), ('Pro', 'PRO')], default='Free'),
+            model_name="subscription",
+            name="typeSubscription",
+            field=models.TextField(
+                choices=[("Free", "FREE"), ("Basic", "BASIC"), ("Pro", "PRO")],
+                default="Free",
+            ),
         ),
     ]

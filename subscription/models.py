@@ -4,11 +4,12 @@ from user.models import OcialClient
 from .models import *
 from ocial.models import *
 
+
 class Subscription(models.Model):
 
     typeSubscription = models.TextField(
-        choices=[(type.value,type.name)for type in TypeSubscription],
-        default = TypeSubscription.FREE.value
+        choices=[(type.value, type.name) for type in TypeSubscription],
+        default=TypeSubscription.FREE.value,
     )
     numEvents = models.PositiveIntegerField(default=1)
     canEditEvent = models.BooleanField(default=False)
@@ -37,7 +38,8 @@ class Subscription(models.Model):
             self.canHaveRating
             self.ocialClientId
 
+
 class SubscriptionForm(ModelForm):
     class Meta:
         model = Subscription
-        fields = '__all__'
+        fields = "__all__"
