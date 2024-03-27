@@ -85,10 +85,10 @@ class EventListByClient(generics.ListAPIView):
 
 
 class EventCreate(generics.CreateAPIView):
-    serializer_class = EventSerializer
+    serializer_class = EventCreateSerializer
 
     @extend_schema(
-        request=EventSerializer,
+        request=EventCreateSerializer,
         description="Create a new event",
         responses={
             201: OpenApiResponse(response=None, description="El evento se ha creado"),
@@ -258,10 +258,10 @@ class EventDelete(generics.DestroyAPIView):
 
 
 class EventUpdate(APIView):
-    serializer_class = EventSerializer
+    serializer_class = EventCreateSerializer
 
     @extend_schema(
-        request=EventSerializer,
+        request=EventCreateSerializer,
         description="Update an event",
         responses={
             200: OpenApiResponse(

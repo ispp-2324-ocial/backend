@@ -22,9 +22,17 @@ class OcialClientSerializer(serializers.ModelSerializer):
         fields = ["name", "defaultLatitude", "defaultLongitude"]
 
 
-class EventSerializer(serializers.ModelSerializer):
+class EventCreateSerializer(serializers.ModelSerializer):
     ocialClient = OcialClientSerializer()
     imageB64 = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = Event
+        fields = "__all__"
+
+
+class EventSerializer(serializers.ModelSerializer):
+    ocialClient = OcialClientSerializer()
     image = ImageSerializer(read_only=True)
 
     class Meta:
