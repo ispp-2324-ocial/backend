@@ -310,13 +310,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/EventCreate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/EventCreate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/EventCreate'
         required: true
       security:
       - tokenAuth: []
@@ -342,13 +342,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/EventCreate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/EventCreate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/EventCreate'
         required: true
       security:
       - tokenAuth: []
@@ -563,13 +563,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Client'
+              $ref: '#/components/schemas/ClientCreate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Client'
+              $ref: '#/components/schemas/ClientCreate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Client'
+              $ref: '#/components/schemas/ClientCreate'
         required: true
       security:
       - tokenAuth: []
@@ -722,7 +722,7 @@ components:
           items:
             $ref: '#/components/schemas/Message'
           readOnly: true
-    Client:
+    ClientCreate:
       type: object
       properties:
         id:
@@ -741,10 +741,6 @@ components:
         imageB64:
           type: string
           writeOnly: true
-        image:
-          allOf:
-          - $ref: '#/components/schemas/Image'
-          readOnly: true
         name:
           type: string
         identificationDocument:
@@ -760,6 +756,9 @@ components:
           format: double
         djangoUser:
           type: integer
+        image:
+          type: integer
+          nullable: true
       required:
       - defaultLatitude
       - defaultLongitude
@@ -776,9 +775,6 @@ components:
           readOnly: true
         ocialClient:
           $ref: '#/components/schemas/OcialClient'
-        imageB64:
-          type: string
-          writeOnly: true
         image:
           allOf:
           - $ref: '#/components/schemas/Image'
@@ -814,6 +810,51 @@ components:
       - name
       - ocialClient
       - place
+    EventCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        ocialClient:
+          $ref: '#/components/schemas/OcialClient'
+        imageB64:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+        place:
+          type: string
+        event:
+          type: string
+        timeStart:
+          type: string
+          format: date-time
+        timeEnd:
+          type: string
+          format: date-time
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        image:
+          type: integer
+          nullable: true
+      required:
+      - event
+      - latitude
+      - longitude
+      - name
+      - ocialClient
+      - place
     GoogleSocialAuth:
       type: object
       properties:
@@ -834,9 +875,6 @@ components:
     Image:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
         image:
           type: string
           format: uri
