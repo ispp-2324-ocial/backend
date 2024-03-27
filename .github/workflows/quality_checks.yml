@@ -12,12 +12,13 @@ on:
   merge_group:
 
 env:
-  DB_IMAGE: postgres:latest
+  DEBUG: True
+  KEY: ${{ secrets.SECRET_KEY }}
   DB_NAME: ocialdb
   DB_USERNAME: ocialuser
   DB_PASSWORD: ocialpass123
-  # Necesario porque el contenedor no tiene comprobaciones de su salud
-  DB_OPTIONS: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 
+  DB_HOST: 127.0.0.1
+  DB_PORT: 5432
 
 jobs:
   dependency-review:
@@ -43,14 +44,15 @@ jobs:
 
     services:
       postgres:
-        image: ${{ env.DB_IMAGE }}
+        image: postgres:latest
         env:
-          POSTGRES_DB: ${{ env.DB_NAME }}
-          POSTGRES_USER: ${{ env.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+          POSTGRES_DB: ocialdb
+          POSTGRES_USER: ocialuser
+          POSTGRES_PASSWORD: ocialpass123
         ports:
           - 5432:5432
-        options: ${{ env.DB_OPTIONS }}
+        # Necesario porque el contenedor no tiene comprobaciones de su salud
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - name: Checkout ⬇️
@@ -86,14 +88,15 @@ jobs:
 
     services:
       postgres:
-        image: ${{ env.DB_IMAGE }}
+        image: postgres:latest
         env:
-          POSTGRES_DB: ${{ env.DB_NAME }}
-          POSTGRES_USER: ${{ env.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+          POSTGRES_DB: ocialdb
+          POSTGRES_USER: ocialuser
+          POSTGRES_PASSWORD: ocialpass123
         ports:
           - 5432:5432
-        options: ${{ env.DB_OPTIONS }}
+        # Necesario porque el contenedor no tiene comprobaciones de su salud
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - name: Checkout ⬇️
@@ -151,6 +154,7 @@ jobs:
         uses: actions/checkout@v4.1.1
         with:
           show-progress: false
+          fetch-depth: 0
 
       - name: Check if all commits comply with the specification
         uses: webiny/action-conventional-commits@v1.3.0

@@ -22,7 +22,7 @@ jobs:
       DB_NAME: ocialdb
       DB_USERNAME: ocialuser
       DB_PASSWORD: ocialpass123
-      DB_HOST: localhost
+      DB_HOST: 127.0.0.1
       DB_PORT: 5432
     
     permissions:
