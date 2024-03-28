@@ -152,6 +152,31 @@ paths:
           description: ''
         '400':
           description: Error in request
+  /api/event/{id}/:
+    get:
+      operationId: event_list
+      description: Get details of an event by event id
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventGet'
+          description: ''
+        '404':
+          description: Event not found
   /api/event/{id}/client/:
     get:
       operationId: event_client_retrieve
@@ -1081,6 +1106,48 @@ components:
         longitude:
           type: number
           format: double
+        image:
+          type: integer
+          nullable: true
+      required:
+      - event
+      - latitude
+      - longitude
+      - name
+      - ocialClient
+      - place
+    EventGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        place:
+          type: string
+        event:
+          type: string
+        timeStart:
+          type: string
+          format: date-time
+        timeEnd:
+          type: string
+          format: date-time
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        ocialClient:
+          type: integer
         image:
           type: integer
           nullable: true
