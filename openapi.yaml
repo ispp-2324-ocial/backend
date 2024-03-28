@@ -384,9 +384,30 @@ paths:
           description: ''
         '400':
           description: Error in request
-  /api/event/list/client/{id}/:
+  /api/event/list/client/:
     get:
       operationId: event_list_client_list
+      description: List of events by current client
+      tags:
+      - event
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+        '401':
+          description: No estás logueado
+        '403':
+          description: No eres cliente
+  /api/event/list/client/id/{id}/:
+    get:
+      operationId: event_list_client_id_list
       description: List of events by client id
       parameters:
       - in: path

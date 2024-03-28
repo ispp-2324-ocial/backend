@@ -5,7 +5,7 @@ urlpatterns = [
     path("<int:pk>/client/", views.EventClientGet.as_view(), name="client_get"),
     path("list/", views.EventList.as_view(), name="event_list"),
     path(
-        "list/client/<int:pk>/",
+        "list/client/id/<int:pk>/",
         views.EventListByClient.as_view(),
         name="event_list_by_client",
     ),
