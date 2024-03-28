@@ -18,6 +18,8 @@ from django.core.files.base import ContentFile
 import blurhash
 from PIL import Image
 from images.models import Image as ImageModel
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 
 class RegisterUserView(APIView):
@@ -50,6 +52,14 @@ class RegisterUserView(APIView):
             return Response(
                 {"error": "El correo ya está registrado"},
                 status=status.HTTP_409_CONFLICT,
+            )
+        
+        try:
+            validate_email(email)
+        except ValidationError:
+            return Response(
+                {"error": "El correo es inválido"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         userdata = {
@@ -212,6 +222,14 @@ class RegisterClientView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
+        try:
+            validate_email(email)
+        except ValidationError:
+            return Response(
+                {"error": "El correo es inválido"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
         data = request.data
         image = data.get("imageB64")
         userdata = {
@@ -586,3 +604,78 @@ class RatingUpdate(generics.UpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class ClientGetView(generics.ListAPIView):
+    serializer_class = ClientGetSerializer
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        description="Retrieve the current client data for the authenticated client.",
+        responses={
+            200: OpenApiResponse(response=ClientGetSerializer),
+            400: OpenApiResponse(response=None, description="Bad Request"),
+            401: OpenApiResponse(response=None, description="Unauthorized"),
+            403: OpenApiResponse(response=None, description="Forbidden"),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        token_key = request.headers.get("Authorization").split(" ")[1]
+        try:
+            token = Token.objects.get(key=token_key)
+        except Token.DoesNotExist:
+            return Response(
+                {"error": "Token inválido"}, status=status.HTTP_401_UNAUTHORIZED
+            )
+        user = token.user
+        try:
+            ocial_client = OcialClient.objects.get(djangoUser=user)
+            serialized_client = self.get_serializer(ocial_client)
+            return Response(
+                    {
+                        "ocialClient": serialized_client.data,
+                        "username": user.username,
+                        "email": user.email,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+        except OcialClient.DoesNotExist:
+            return Response(
+                {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
+            )
+        
+class UserGetView(generics.ListAPIView):
+    serializer_class = UserGetSerializer
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        description="Retrieve the current user data for the authenticated user.",
+        responses={
+            200: OpenApiResponse(response=UserGetSerializer),
+            400: OpenApiResponse(response=None, description="Bad Request"),
+            401: OpenApiResponse(response=None, description="Unauthorized"),
+            403: OpenApiResponse(response=None, description="Forbidden"),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        token_key = request.headers.get("Authorization").split(" ")[1]
+        try:
+            token = Token.objects.get(key=token_key)
+        except Token.DoesNotExist:
+            return Response(
+                {"error": "Token inválido"}, status=status.HTTP_401_UNAUTHORIZED
+            )
+        user = token.user
+        try:
+            ocial_user = OcialUser.objects.get(djangoUser=user)
+            serialized_user = self.get_serializer(ocial_user)
+            return Response(
+                    {
+                        "ocialClient": serialized_user.data,
+                        "username": user.username,
+                        "email": user.email,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+        except OcialUser.DoesNotExist:
+            return Response(
+                {"error": "No eres usuario"}, status=status.HTTP_403_FORBIDDEN
+            )
