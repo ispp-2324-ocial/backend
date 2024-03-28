@@ -594,3 +594,23 @@ class EventLike(generics.ListAPIView):
             )
         like.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class EventGet(generics.ListAPIView):
+    serializer_class = EventGetSerializer
+    permission_classes = [IsAuthenticated]
+    @extend_schema(
+        description="Get details of an event by event id",
+        responses={
+            200: OpenApiResponse(response=EventGetSerializer),
+            404: OpenApiResponse(response=None, description="Event not found"),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        try:
+            event = Event.objects.get(pk=kwargs["pk"])
+            serialized_event = self.get_serializer(event)
+            return Response(serialized_event.data, status=status.HTTP_200_OK)
+        except Event.DoesNotExist:
+            return Response(
+                {"error": "No existe el evento"}, status=status.HTTP_404_NOT_FOUND
+            )

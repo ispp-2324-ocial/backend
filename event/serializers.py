@@ -38,3 +38,8 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = "__all__"
+
+class EventGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = "__all__"

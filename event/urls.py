@@ -15,4 +15,5 @@ urlpatterns = [
     path("<int:pk>/delete/", views.EventDelete.as_view(), name="event_delete"),
     path("<int:pk>/like/", views.EventLike.as_view(), name="event_like"),
     path("nearby/", views.EventNearby.as_view(), name="event_nearby"),
+    path("<int:pk>/", views.EventGet.as_view(), name="event_get"),
 ]
