@@ -10,7 +10,7 @@ from images.models import Image
 class Event(models.Model):
     name = models.TextField()
     place = models.TextField()
-    event = models.TextField()
+    description = models.TextField()
     timeStart = models.DateTimeField(default="1030-01-01 09:00:00")
     timeEnd = models.DateTimeField(default="1030-01-01 10:00:00")
     capacity = models.PositiveIntegerField(default=0)

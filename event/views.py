@@ -627,3 +627,68 @@ class EventLike(generics.ListAPIView):
             )
         like.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+    class EventFiltered(generics.ListAPIView):
+        queryset = Event.objects.all()
+        serializer_class = EventSerializer
+
+    @extend_schema(
+        description="List of events filtered by a parameter",
+         parameters=[
+            OpenApiParameter(
+                name="timeStart",
+                type=datetime,
+                description="Date since the user want to see the events",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="timeEnd",
+                type=datetime,
+                description="Date until the user want to see the events",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="category",
+                type=str,
+                description="Name of the category of the event to filter", 
+                required=True,
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(response=EventSerializer(many=True)),
+            400: OpenApiResponse(response=None, description="Error in request"),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        timeStart = serializer.validated_data["timeStart"]
+        timeEnd = serializer.validated_data["timeEnd"]
+        category = serializer.validated_data["category"]
+        
+        if(timeStart != null):
+            events == Event.objects.filter(
+                timeStart__gte=timeStart
+            )
+        
+        
+        if(timeEnd != null):
+            events == Event.objects.filter(
+                timeEnd__lte=timeEnd
+            )
+        
+        
+        if(category != null):
+            events == Event.objects.filter(
+                category=category
+            )
+        
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data)
+
+        
+        
+        
+        
