@@ -91,11 +91,11 @@ class RatingSerializer(serializers.ModelSerializer):
         model = Rating
         fields = "__all__"
 
-
 class RatingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ("score", "comment")
+        
 class ClientGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = OcialClient
