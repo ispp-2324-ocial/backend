@@ -1,9 +1,11 @@
 from django.test import TestCase
 
 from django.contrib.auth.models import User
-from ocial.models import TypeClient
+from ocial.models import Category, TypeClient
 from user.models import OcialClient
 from .models import Event
+from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
 
 class EventTestCase(TestCase):
     def setUp(self):
@@ -27,9 +29,8 @@ class EventTestCase(TestCase):
         self.event_data = {
             "name": "Football Match",
             "place": "Stadium ABC",
-            "description": "Match between Team A and Team B",
-            "date": "2024-02-25",
-            "hour": "15:00:00",
+            "timeStart": "2024-02-25 15:00:00",
+            "timeEnd": "2024-02-25 17:00:00",
             "capacity": 50000,
             "category": "SPORTS",
             "latitude": 40.7128,
@@ -51,4 +52,34 @@ class EventTestCase(TestCase):
         event = Event.objects.create(**self.event_data)
         event.delete()
         self.assertEqual(Event.objects.count(), 0)
+
+    def test_event_str_representation(self):
+        event = Event.objects.create(**self.event_data)
+        expected_str = f"{event.name}: {event.event} | {event.timeStart} -> {event.timeEnd}"
+        self.assertEqual(str(event), expected_str)
+
+    def test_event_default_capacity(self):
+        event = Event.objects.create(**self.event_data)
+        self.assertEqual(event.capacity, 50000)
+
+    def test_event_category_choices(self):
+        event = Event.objects.create(**self.event_data)
+        categories = dict(event._meta.get_field('category').choices)
+        self.assertIn(event.category, categories.values())
+
+    def test_invalid_capacity(self):
+        self.event_data['capacity'] = -100  # Valor de capacidad inválido
+        with self.assertRaises(IntegrityError):
+            Event.objects.create(**self.event_data)
+
+    def test_invalid_date(self):
+        self.event_data['timeStart'] = '2023-02-30 15:00:00'  # Fecha inválida (30 de febrero)
+        with self.assertRaises(ValidationError):
+            Event.objects.create(**self.event_data)
+
+    def test_invalid_hour(self):
+        self.event_data['timeStart'] = '2023-02-25 25:00:00'  # Hora inválida
+        with self.assertRaises(ValidationError):
+            Event.objects.create(**self.event_data)
+
 
