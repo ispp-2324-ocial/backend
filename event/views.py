@@ -16,6 +16,7 @@ from user.models import OcialClient, OcialUser
 from .models import OcialEventForm, Like, Event
 from rest_framework.authtoken.models import Token
 from datetime import datetime, timedelta
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
@@ -82,6 +83,38 @@ class EventListByClient(generics.ListAPIView):
         events = Event.objects.filter(ocialClient=ocialClient[0])
         serialized_events = [EventSerializer(event).data for event in events]
         return Response(serialized_events, status=status.HTTP_200_OK)
+
+class EventListClient(generics.ListAPIView):
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        description="List of events by current client",
+        responses={
+            200: OpenApiResponse(response=EventSerializer(many=True)),
+            401: OpenApiResponse(response=None, description="No estás logueado"),
+            403: OpenApiResponse(response=None, description="No eres cliente"),
+        },
+    )
+
+    def get(self, request, *args, **kwargs):
+        token_key = request.headers.get("Authorization").split(" ")[1]
+        try:
+            token = Token.objects.get(key=token_key)
+        except Token.DoesNotExist:
+            return Response(
+                {"error": "Token inválido"}, status=status.HTTP_401_UNAUTHORIZED
+            )
+        user = token.user
+        try:
+            ocial_client = OcialClient.objects.get(djangoUser=user)
+            events = Event.objects.filter(ocialClient=ocial_client)
+            serialized_events = [EventSerializer(event).data for event in events]
+            return Response(serialized_events, status=status.HTTP_200_OK)
+        except OcialClient.DoesNotExist:
+            return Response(
+                {"error": "No eres cliente"}, status=status.HTTP_403_FORBIDDEN
+            )
 
 
 class EventCreate(generics.CreateAPIView):
