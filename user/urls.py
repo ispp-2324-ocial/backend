@@ -17,4 +17,10 @@ urlpatterns = [
     path("rating/<int:pk>/delete", views.RatingDelete.as_view(), name="rating_delete"),
     path('ratings/by-client/<int:pk>/', views.RatingIDClientListView.as_view(), name='ratings_by_client'),
     path("rating/<int:pk>/update", views.RatingUpdate.as_view(), name="rating_update"),
+    path(
+        "client/get/", views.ClientGetView.as_view(), name="client_data"
+    ),
+    path(
+        "user/get/", views.UserGetView.as_view(), name="user_data"
+    ),
 ]
