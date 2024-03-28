@@ -554,6 +554,29 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+  /api/users/client/get/:
+    get:
+      operationId: users_client_get_list
+      description: Retrieve the current client data for the authenticated client.
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientGet'
+          description: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
   /api/users/client/register/:
     post:
       operationId: users_client_register_create
@@ -586,7 +609,6 @@ paths:
   /api/users/login/:
     post:
       operationId: users_login_create
-      description: Inicia la sesión del usuario y devuelve el token de autenticación
       tags:
       - users
       requestBody:
@@ -618,7 +640,6 @@ paths:
   /api/users/logout/:
     post:
       operationId: users_logout_create
-      description: Cierra la sesión del usuario
       tags:
       - users
       security:
@@ -631,6 +652,170 @@ paths:
             lo que se considera que la sesión está cerrada
         '401':
           description: El usuario no está autenticado
+  /api/users/rating/{id}/:
+    post:
+      operationId: users_rating_create
+      description: Create a rating
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RatingCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RatingCreate'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingCreate'
+          description: ''
+        '400':
+          description: Error in request
+        '404':
+          description: Rating not found
+  /api/users/rating/{id}/delete:
+    delete:
+      operationId: users_rating_delete_destroy
+      description: Delete a rating
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: Rating deleted successfully
+        '404':
+          description: Message not found
+  /api/users/rating/{id}/update:
+    put:
+      operationId: users_rating_update_update
+      description: Update an existing rating
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RatingCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RatingCreate'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingCreate'
+          description: ''
+        '400':
+          description: Error in request
+        '404':
+          description: Rating not found
+    patch:
+      operationId: users_rating_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRatingCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRatingCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRatingCreate'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingCreate'
+          description: ''
+  /api/users/ratings/by-client/{id}/:
+    get:
+      operationId: users_ratings_by_client_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+          description: ''
+  /api/users/user/get/:
+    get:
+      operationId: users_user_get_list
+      description: Retrieve the current user data for the authenticated user.
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserGet'
+          description: ''
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
   /api/users/user/google-oauth2/:
     post:
       operationId: users_user_google_oauth2_create
@@ -767,6 +952,36 @@ components:
       - name
       - password
       - username
+    ClientGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        identificationDocument:
+          type: string
+          maxLength: 9
+        typeClient:
+          $ref: '#/components/schemas/TypeClientEnum'
+        defaultLatitude:
+          type: number
+          format: double
+        defaultLongitude:
+          type: number
+          format: double
+        djangoUser:
+          type: integer
+        image:
+          type: integer
+          nullable: true
+      required:
+      - defaultLatitude
+      - defaultLongitude
+      - djangoUser
+      - identificationDocument
+      - name
     Event:
       type: object
       properties:
@@ -957,6 +1172,46 @@ components:
       - defaultLatitude
       - defaultLongitude
       - name
+    PatchedRatingCreate:
+      type: object
+      properties:
+        score:
+          type: integer
+          maximum: 5
+          minimum: 0
+        comment:
+          type: string
+          nullable: true
+    Rating:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        score:
+          type: integer
+          maximum: 5
+          minimum: 0
+        comment:
+          type: string
+          nullable: true
+        client:
+          type: integer
+        user:
+          type: integer
+      required:
+      - client
+      - user
+    RatingCreate:
+      type: object
+      properties:
+        score:
+          type: integer
+          maximum: 5
+          minimum: 0
+        comment:
+          type: string
+          nullable: true
     Subscription:
       type: object
       properties:
@@ -1054,6 +1309,26 @@ components:
       - lastKnowLocLong
       - password
       - username
+    UserGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        auth_provider:
+          $ref: '#/components/schemas/AuthProviderEnum'
+        lastKnowLocLat:
+          type: number
+          format: double
+        lastKnowLocLong:
+          type: number
+          format: double
+        djangoUser:
+          type: integer
+      required:
+      - djangoUser
+      - lastKnowLocLat
+      - lastKnowLocLong
   securitySchemes:
     tokenAuth:
       type: apiKey
